@@ -186,14 +186,93 @@ function draw(){
     }
   });
 
-  drawVehicle();
-}
+  function drawVehicle(){
+  ctx.save();
+  ctx.translate(player.x, player.y - 10);
 
-function loop(){
-  if(!running) return;
-  update();
-  draw();
-  requestAnimationFrame(loop);
+  // Wheels
+  ctx.fillStyle = '#111';
+  ctx.beginPath();
+  ctx.arc(-22, 12, 11, 0, Math.PI * 2);
+  ctx.arc(22, 12, 11, 0, Math.PI * 2);
+  ctx.fill();
+
+  if(vehicle === 'car'){
+    // Car body
+    ctx.fillStyle = '#d32f2f';
+    ctx.fillRect(-38, -16, 76, 24);
+
+    // Car roof
+    ctx.fillStyle = '#b71c1c';
+    ctx.beginPath();
+    ctx.moveTo(-15,-16);
+    ctx.lineTo(0,-34);
+    ctx.lineTo(24,-34);
+    ctx.lineTo(34,-16);
+    ctx.closePath();
+    ctx.fill();
+  }else{
+    // Bike frame
+    ctx.fillStyle = '#444';
+    ctx.fillRect(-18, -6, 36, 6);
+
+    ctx.strokeStyle = '#555';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(-10,-6);
+    ctx.lineTo(8,-18);
+    ctx.lineTo(18,-6);
+    ctx.stroke();
+  }
+
+  // ===== Original fat rider =====
+
+  // Head
+  ctx.fillStyle = '#f2c28b';
+  ctx.beginPath();
+  ctx.arc(6,-42,11,0,Math.PI*2);
+  ctx.fill();
+
+  // Hair
+  ctx.fillStyle = '#111';
+  ctx.beginPath();
+  ctx.arc(6,-48,10,Math.PI,Math.PI*2);
+  ctx.fill();
+
+  // Mustache
+  ctx.strokeStyle = '#111';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(-2,-39);
+  ctx.lineTo(14,-39);
+  ctx.stroke();
+
+  // Fat body
+  ctx.fillStyle = '#d32f2f';
+  ctx.beginPath();
+  ctx.ellipse(6,-18,18,22,0,0,Math.PI*2);
+  ctx.fill();
+
+  // Arms
+  ctx.strokeStyle = '#f2c28b';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(-4,-24);
+  ctx.lineTo(-20,-10);
+  ctx.moveTo(16,-24);
+  ctx.lineTo(28,-10);
+  ctx.stroke();
+
+  // Legs
+  ctx.strokeStyle = '#ffcc66';
+  ctx.beginPath();
+  ctx.moveTo(0,2);
+  ctx.lineTo(-8,16);
+  ctx.moveTo(12,2);
+  ctx.lineTo(22,16);
+  ctx.stroke();
+
+  ctx.restore();
 }
 
 
