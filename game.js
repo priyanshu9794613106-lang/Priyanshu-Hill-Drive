@@ -1,106 +1,157 @@
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
+const canvas=document.getElementById('gameCanvas');
+const ctx=canvas.getContext('2d');
 
-function resize(){
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight * 0.8;
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+
+const menu=document.getElementById('menu');
+const hud=document.getElementById('hud');
+const controls=document.getElementById('controls');
+const startBtn=document.getElementById('startBtn');
+
+let running=false;
+let speed=0;
+let distance=0;
+let coins=0;
+let fuel=100;
+let accel=false;
+let brake=false;
+
+const car={x:150,y:0,vy:0};
+
+const coinList=[];
+const fuelList=[];
+
+for(let i=300;i<5000;i+=300){
+  coinList.push({x:i});
 }
-resize();
-window.addEventListener('resize', resize);
-
-let accel = false;
-let brake = false;
-
-document.getElementById('accelerate').ontouchstart = ()=> accel = true;
-document.getElementById('accelerate').ontouchend = ()=> accel = false;
-document.getElementById('brake').ontouchstart = ()=> brake = true;
-document.getElementById('brake').ontouchend = ()=> brake = false;
-
-document.getElementById('accelerate').onmousedown = ()=> accel = true;
-document.getElementById('accelerate').onmouseup = ()=> accel = false;
-document.getElementById('brake').onmousedown = ()=> brake = true;
-document.getElementById('brake').onmouseup = ()=> brake = false;
-
-window.addEventListener('keydown', e=>{
-  if(e.key==='ArrowRight') accel = true;
-  if(e.key==='ArrowLeft') brake = true;
-});
-window.addEventListener('keyup', e=>{
-  if(e.key==='ArrowRight') accel = false;
-  if(e.key==='ArrowLeft') brake = false;
-});
-
-let speed = 0;
-let distance = 0;
-let fuel = 100;
-let x = 140;
-let y = 0;
-let vy = 0;
-const gravity = 0.5;
-
-function ground(px){
-  return canvas.height - 80 - Math.sin(px/120)*35 - Math.sin(px/55)*15;
+for(let i=800;i<5000;i+=900){
+  fuelList.push({x:i});
 }
 
-function drawCar(cx, cy){
-  ctx.save();
-  ctx.translate(cx, cy);
-  ctx.fillStyle = '#e53935';
-  ctx.fillRect(-30, -16, 60, 22);
-  ctx.fillStyle = '#111';
-  ctx.beginPath();
-  ctx.arc(-18, 10, 10, 0, Math.PI*2);
-  ctx.arc(18, 10, 10, 0, Math.PI*2);
-  ctx.fill();
-  ctx.restore();
+function ground(x){
+  return canvas.height-120-Math.sin(x/180)*45-Math.sin(x/70)*18;
 }
+
+startBtn.onclick=()=>{
+  menu.style.display='none';
+  hud.style.display='block';
+  controls.style.display='flex';
+  running=true;
+  car.y=ground(car.x);
+  requestAnimationFrame(loop);
+};
+
+document.getElementById('gas').onmousedown=()=>accel=true;
+document.getElementById('gas').onmouseup=()=>accel=false;
+document.getElementById('brake').onmousedown=()=>brake=true;
+document.getElementById('brake').onmouseup=()=>brake=false;
+
+document.getElementById('gas').ontouchstart=()=>accel=true;
+document.getElementById('gas').ontouchend=()=>accel=false;
+document.getElementById('brake').ontouchstart=()=>brake=true;
+document.getElementById('brake').ontouchend=()=>brake=false;
 
 function update(){
-  if(accel && fuel>0){
-    speed += 0.12;
-    fuel -= 0.03;
+  if(accel&&fuel>0){
+    speed+=0.15;
+    fuel-=0.04;
   }
-  if(brake) speed -= 0.18;
+  if(brake) speed-=0.2;
 
-  speed *= 0.99;
-  speed = Math.max(0, Math.min(speed, 8));
+  speed*=0.99;
+  speed=Math.max(0,Math.min(speed,8));
+  distance+=speed;
 
-  distance += speed;
-
-  const gy = ground(distance + x);
-  vy += gravity;
-  y += vy;
-
-  if(y > gy){
-    y = gy;
-    vy = 0;
+  const gy=ground(distance+car.x);
+  car.vy+=0.5;
+  car.y+=car.vy;
+  if(car.y>gy){
+    car.y=gy;
+    car.vy=0;
   }
 
-  document.getElementById('distance').textContent = Math.floor(distance);
-  document.getElementById('fuel').textContent = Math.max(0, Math.floor(fuel));
+  coinList.forEach(c=>{
+    if(!c.taken&&Math.abs(c.x-distance-car.x)<25){
+      c.taken=true;
+      coins++;
+    }
+  });
+
+  fuelList.forEach(f=>{
+    if(!f.taken&&Math.abs(f.x-distance-car.x)<25){
+      f.taken=true;
+      fuel=Math.min(100,fuel+30);
+    }
+  });
+
+  document.getElementById('distance').textContent=Math.floor(distance);
+  document.getElementById('coins').textContent=coins;
+  document.getElementById('fuel').textContent=Math.floor(fuel);
+}
+
+function drawCar(){
+  ctx.save();
+  ctx.translate(car.x,car.y-10);
+
+  ctx.fillStyle='#ff5722';
+  ctx.fillRect(-35,-18,70,24);
+
+  ctx.fillStyle='#ffd54f';
+  ctx.beginPath();
+  ctx.arc(0,-25,8,0,Math.PI*2);
+  ctx.fill();
+
+  ctx.fillStyle='black';
+  ctx.beginPath();
+  ctx.arc(-22,10,11,0,Math.PI*2);
+  ctx.arc(22,10,11,0,Math.PI*2);
+  ctx.fill();
+
+  ctx.restore();
 }
 
 function draw(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
 
-  ctx.fillStyle = '#6ab04c';
+  ctx.fillStyle='#7cb342';
   ctx.beginPath();
-  ctx.moveTo(0, canvas.height);
-  for(let i=0;i<=canvas.width;i+=8){
-    ctx.lineTo(i, ground(distance+i));
+  ctx.moveTo(0,canvas.height);
+  for(let i=0;i<=canvas.width;i+=6){
+    ctx.lineTo(i,ground(distance+i));
   }
-  ctx.lineTo(canvas.width, canvas.height);
+  ctx.lineTo(canvas.width,canvas.height);
   ctx.closePath();
   ctx.fill();
 
-  drawCar(x, y-10);
+  coinList.forEach(c=>{
+    if(c.taken) return;
+    const sx=c.x-distance;
+    if(sx>-20&&sx<canvas.width+20){
+      ctx.fillStyle='gold';
+      ctx.beginPath();
+      ctx.arc(sx,ground(c.x)-35,10,0,Math.PI*2);
+      ctx.fill();
+    }
+  });
+
+  fuelList.forEach(f=>{
+    if(f.taken) return;
+    const sx=f.x-distance;
+    if(sx>-20&&sx<canvas.width+20){
+      ctx.fillStyle='red';
+      ctx.fillRect(sx-8,ground(f.x)-48,16,24);
+      ctx.fillStyle='white';
+      ctx.fillRect(sx-2,ground(f.x)-44,4,16);
+    }
+  });
+
+  drawCar();
 }
 
 function loop(){
+  if(!running) return;
   update();
   draw();
   requestAnimationFrame(loop);
 }
-
-y = ground(x);
-loop();
