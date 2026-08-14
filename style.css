@@ -6,7 +6,7 @@
 
 body{
   overflow:hidden;
-  font-family:Arial, sans-serif;
+  font-family:Arial, Helvetica, sans-serif;
   background:#87CEEB;
 }
 
@@ -29,32 +29,12 @@ body{
 }
 
 #menu p{
-  margin:5px 0;
   font-size:18px;
-}
-
-.garage{
-  margin:20px 0;
-  text-align:center;
-}
-
-.garage h2{
-  margin-bottom:10px;
-}
-
-.garage button{
-  padding:12px 25px;
-  margin:8px;
-  font-size:18px;
-  border:none;
-  border-radius:10px;
-  background:#ff9800;
-  color:white;
-  cursor:pointer;
+  margin-bottom:20px;
 }
 
 #startBtn{
-  padding:15px 40px;
+  padding:15px 35px;
   font-size:22px;
   border:none;
   border-radius:12px;
@@ -73,10 +53,13 @@ body{
   position:absolute;
   top:10px;
   left:10px;
-  color:white;
-  font-size:20px;
-  text-shadow:2px 2px 4px black;
+  right:10px;
   display:none;
+  justify-content:space-between;
+  color:white;
+  font-size:18px;
+  text-shadow:2px 2px 4px black;
+  z-index:5;
 }
 
 #controls{
@@ -86,17 +69,22 @@ body{
   display:none;
   justify-content:space-between;
   padding:0 20px;
+  z-index:5;
 }
 
 #controls button{
   width:140px;
   height:65px;
-  font-size:20px;
   border:none;
   border-radius:15px;
   background:#222;
   color:white;
+  font-size:20px;
   opacity:0.9;
+}
+
+#controls button:active{
+  transform:scale(0.96);
 }
 
 @media(max-width:768px){
@@ -108,5 +96,9 @@ body{
     width:120px;
     height:60px;
     font-size:18px;
+  }
+
+  #hud{
+    font-size:16px;
   }
 }
