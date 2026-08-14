@@ -1,34 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta name="google-site-verification" content="sdVPPhBXcVADF5OcNHnqDPqVsSWv40cItouin7mPWJg" />
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Priyanshu Hill Drive</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
   <div id="menu">
     <h1>PRIYANSHU HILL DRIVE</h1>
     <p>Developer: Priyanshu Mishra</p>
-    <p>Mobile: 9794613106</p>
-
-    <div class="garage">
-      <h2>Select Vehicle</h2>
-      <button onclick="selectVehicle('car')">🚙 Car</button>
-      <button onclick="selectVehicle('bike')">🏍 Bike</button>
-    </div>
-
     <button id="startBtn">Start Game</button>
   </div>
 
   <canvas id="gameCanvas"></canvas>
 
   <div id="hud">
-    <div>Distance: <span id="distance">0</span> m</div>
-    <div>Coins: <span id="coins">0</span></div>
-    <div>Fuel: <span id="fuel">100</span>%</div>
+    <span>Distance: <b id="distance">0</b> m</span>
+    <span>Coins: <b id="coins">0</b></span>
+    <span>Fuel: <b id="fuel">100</b>%</span>
   </div>
 
   <div id="controls">
