@@ -9,9 +9,6 @@ const hud = document.getElementById('hud');
 const controls = document.getElementById('controls');
 const startBtn = document.getElementById('startBtn');
 
-let vehicle = 'car';
-function selectVehicle(v){ vehicle = v; }
-
 let running = false;
 let speed = 0;
 let distance = 0;
@@ -20,28 +17,35 @@ let fuel = 100;
 let accel = false;
 let brake = false;
 
-const player = { x: 150, y: 0, vy: 0 };
+const rider = {
+  x: 160,
+  y: 0,
+  vy: 0
+};
 
 const coinList = [];
 const fuelList = [];
 
-for(let i=300;i<6000;i+=250){
-  coinList.push({x:i, taken:false});
-}
-for(let i=800;i<6000;i+=900){
-  fuelList.push({x:i, taken:false});
+for (let i = 300; i < 6000; i += 220) {
+  coinList.push({ x: i, taken: false });
 }
 
-function ground(x){
-  return canvas.height - 120 - Math.sin(x/180)*40 - Math.sin(x/70)*18;
+for (let i = 800; i < 6000; i += 900) {
+  fuelList.push({ x: i, taken: false });
+}
+
+function ground(x) {
+  return canvas.height - 130
+    - Math.sin(x / 180) * 45
+    - Math.sin(x / 70) * 18;
 }
 
 startBtn.onclick = () => {
   menu.style.display = 'none';
-  hud.style.display = 'block';
+  hud.style.display = 'flex';
   controls.style.display = 'flex';
   running = true;
-  player.y = ground(player.x);
+  rider.y = ground(rider.x);
   requestAnimationFrame(loop);
 };
 
@@ -55,38 +59,42 @@ document.getElementById('gas').ontouchend = () => accel = false;
 document.getElementById('brake').ontouchstart = () => brake = true;
 document.getElementById('brake').ontouchend = () => brake = false;
 
-function update(){
-  if(accel && fuel>0){
-    speed += 0.12;
+function update() {
+  if (accel && fuel > 0) {
+    speed += 0.14;
     fuel -= 0.04;
   }
-  if(brake) speed -= 0.18;
+
+  if (brake) {
+    speed -= 0.18;
+  }
 
   speed *= 0.99;
   speed = Math.max(0, Math.min(speed, 8));
 
   distance += speed;
 
-  const gy = ground(distance + player.x);
-  player.vy += 0.5;
-  player.y += player.vy;
+  const gy = ground(distance + rider.x);
 
-  if(player.y > gy){
-    player.y = gy;
-    player.vy = 0;
+  rider.vy += 0.5;
+  rider.y += rider.vy;
+
+  if (rider.y > gy) {
+    rider.y = gy;
+    rider.vy = 0;
   }
 
-  coinList.forEach(c=>{
-    if(!c.taken && Math.abs(c.x-distance-player.x)<25){
+  coinList.forEach(c => {
+    if (!c.taken && Math.abs(c.x - distance - rider.x) < 28) {
       c.taken = true;
       coins++;
     }
   });
 
-  fuelList.forEach(f=>{
-    if(!f.taken && Math.abs(f.x-distance-player.x)<25){
+  fuelList.forEach(f => {
+    if (!f.taken && Math.abs(f.x - distance - rider.x) < 28) {
       f.taken = true;
-      fuel = Math.min(100, fuel+30);
+      fuel = Math.min(100, fuel + 25);
     }
   });
 
@@ -95,184 +103,131 @@ function update(){
   document.getElementById('fuel').textContent = Math.floor(fuel);
 }
 
-function drawDriver(){
-  ctx.fillStyle = '#f1c27d';
-  ctx.beginPath();
-  ctx.arc(5,-42,8,0,Math.PI*2);
-  ctx.fill();
-
-  ctx.fillStyle = '#222';
-  ctx.beginPath();
-  ctx.arc(5,-46,8,Math.PI,Math.PI*2);
-  ctx.fill();
-
-  ctx.fillStyle = '#1565c0';
-  ctx.fillRect(0,-34,10,16);
-}
-
-function drawVehicle(){
+function drawRiderBike() {
   ctx.save();
-  ctx.translate(player.x, player.y-10);
+  ctx.translate(rider.x, rider.y - 10);
 
-  if(vehicle==='car'){
-    ctx.fillStyle = '#e53935';
-    ctx.fillRect(-35,-18,70,24);
-
-    ctx.fillStyle = '#c62828';
-    ctx.beginPath();
-    ctx.moveTo(-15,-18);
-    ctx.lineTo(0,-34);
-    ctx.lineTo(22,-34);
-    ctx.lineTo(32,-18);
-    ctx.closePath();
-    ctx.fill();
-
-    drawDriver();
-
-    ctx.fillStyle = '#111';
-    ctx.beginPath();
-    ctx.arc(-22,10,11,0,Math.PI*2);
-    ctx.arc(22,10,11,0,Math.PI*2);
-    ctx.fill();
-
-  }else{
-    ctx.fillStyle = '#444';
-    ctx.fillRect(-18,-8,36,8);
-
-    drawDriver();
-
-    ctx.fillStyle = '#111';
-    ctx.beginPath();
-    ctx.arc(-18,10,10,0,Math.PI*2);
-    ctx.arc(18,10,10,0,Math.PI*2);
-    ctx.fill();
-  }
-
-  ctx.restore();
-}
-
-function draw(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-
-  ctx.fillStyle = '#7cb342';
-  ctx.beginPath();
-  ctx.moveTo(0,canvas.height);
-  for(let i=0;i<=canvas.width;i+=6){
-    ctx.lineTo(i, ground(distance+i));
-  }
-  ctx.lineTo(canvas.width, canvas.height);
-  ctx.closePath();
-  ctx.fill();
-
-  coinList.forEach(c=>{
-    if(c.taken) return;
-    const sx = c.x-distance;
-    if(sx>-20 && sx<canvas.width+20){
-      ctx.fillStyle = 'gold';
-      ctx.beginPath();
-      ctx.arc(sx, ground(c.x)-35,10,0,Math.PI*2);
-      ctx.fill();
-    }
-  });
-
-  fuelList.forEach(f=>{
-    if(f.taken) return;
-    const sx = f.x-distance;
-    if(sx>-20 && sx<canvas.width+20){
-      ctx.fillStyle = 'red';
-      ctx.fillRect(sx-8, ground(f.x)-48,16,24);
-      ctx.fillStyle = 'white';
-      ctx.fillRect(sx-2, ground(f.x)-44,4,16);
-    }
-  });
-
-  function drawVehicle(){
-  ctx.save();
-  ctx.translate(player.x, player.y - 10);
-
-  // Wheels
+  // Bike wheels
   ctx.fillStyle = '#111';
   ctx.beginPath();
   ctx.arc(-22, 12, 11, 0, Math.PI * 2);
   ctx.arc(22, 12, 11, 0, Math.PI * 2);
   ctx.fill();
 
-  if(vehicle === 'car'){
-    // Car body
-    ctx.fillStyle = '#d32f2f';
-    ctx.fillRect(-38, -16, 76, 24);
+  // Bike frame
+  ctx.strokeStyle = '#444';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(-18, 2);
+  ctx.lineTo(0, -10);
+  ctx.lineTo(18, 2);
+  ctx.stroke();
 
-    // Car roof
-    ctx.fillStyle = '#b71c1c';
-    ctx.beginPath();
-    ctx.moveTo(-15,-16);
-    ctx.lineTo(0,-34);
-    ctx.lineTo(24,-34);
-    ctx.lineTo(34,-16);
-    ctx.closePath();
-    ctx.fill();
-  }else{
-    // Bike frame
-    ctx.fillStyle = '#444';
-    ctx.fillRect(-18, -6, 36, 6);
-
-    ctx.strokeStyle = '#555';
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.moveTo(-10,-6);
-    ctx.lineTo(8,-18);
-    ctx.lineTo(18,-6);
-    ctx.stroke();
-  }
-
-  // ===== Original fat rider =====
+  // Fat rider body
+  ctx.fillStyle = '#d32f2f';
+  ctx.beginPath();
+  ctx.ellipse(0, -18, 16, 20, 0, 0, Math.PI * 2);
+  ctx.fill();
 
   // Head
   ctx.fillStyle = '#f2c28b';
   ctx.beginPath();
-  ctx.arc(6,-42,11,0,Math.PI*2);
+  ctx.arc(0, -42, 10, 0, Math.PI * 2);
   ctx.fill();
 
   // Hair
   ctx.fillStyle = '#111';
   ctx.beginPath();
-  ctx.arc(6,-48,10,Math.PI,Math.PI*2);
+  ctx.arc(0, -47, 9, Math.PI, Math.PI * 2);
   ctx.fill();
 
   // Mustache
   ctx.strokeStyle = '#111';
   ctx.lineWidth = 2;
   ctx.beginPath();
-  ctx.moveTo(-2,-39);
-  ctx.lineTo(14,-39);
+  ctx.moveTo(-6, -39);
+  ctx.lineTo(6, -39);
   ctx.stroke();
-
-  // Fat body
-  ctx.fillStyle = '#d32f2f';
-  ctx.beginPath();
-  ctx.ellipse(6,-18,18,22,0,0,Math.PI*2);
-  ctx.fill();
 
   // Arms
   ctx.strokeStyle = '#f2c28b';
   ctx.lineWidth = 3;
   ctx.beginPath();
-  ctx.moveTo(-4,-24);
-  ctx.lineTo(-20,-10);
-  ctx.moveTo(16,-24);
-  ctx.lineTo(28,-10);
+  ctx.moveTo(-10, -20);
+  ctx.lineTo(-22, -8);
+  ctx.moveTo(10, -20);
+  ctx.lineTo(22, -8);
   ctx.stroke();
 
   // Legs
   ctx.strokeStyle = '#ffcc66';
   ctx.beginPath();
-  ctx.moveTo(0,2);
-  ctx.lineTo(-8,16);
-  ctx.moveTo(12,2);
-  ctx.lineTo(22,16);
+  ctx.moveTo(-4, 0);
+  ctx.lineTo(-14, 16);
+  ctx.moveTo(6, 0);
+  ctx.lineTo(16, 16);
   ctx.stroke();
 
   ctx.restore();
 }
 
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+  // Sky
+  const sky = ctx.createLinearGradient(0, 0, 0, canvas.height);
+  sky.addColorStop(0, '#8ed6ff');
+  sky.addColorStop(1, '#d9f5ff');
+  ctx.fillStyle = sky;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Hills
+  ctx.fillStyle = '#6ab04c';
+  ctx.beginPath();
+  ctx.moveTo(0, canvas.height);
+
+  for (let i = 0; i <= canvas.width; i += 6) {
+    ctx.lineTo(i, ground(distance + i));
+  }
+
+  ctx.lineTo(canvas.width, canvas.height);
+  ctx.closePath();
+  ctx.fill();
+
+  // Coins
+  coinList.forEach(c => {
+    if (c.taken) return;
+
+    const sx = c.x - distance;
+
+    if (sx > -20 && sx < canvas.width + 20) {
+      ctx.fillStyle = 'gold';
+      ctx.beginPath();
+      ctx.arc(sx, ground(c.x) - 40, 9, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  });
+
+  // Fuel
+  fuelList.forEach(f => {
+    if (f.taken) return;
+
+    const sx = f.x - distance;
+
+    if (sx > -20 && sx < canvas.width + 20) {
+      ctx.fillStyle = 'red';
+      ctx.fillRect(sx - 8, ground(f.x) - 50, 16, 24);
+      ctx.fillStyle = 'white';
+      ctx.fillRect(sx - 2, ground(f.x) - 44, 4, 12);
+    }
+  });
+
+  drawRiderBike();
+}
+
+function loop() {
+  if (!running) return;
+  update();
+  draw();
+  requestAnimationFrame(loop);
+}
