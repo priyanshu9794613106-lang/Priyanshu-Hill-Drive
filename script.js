@@ -1,7 +1,7 @@
 // ==========================================
 // PRIYANSHU HILL DRIVE
-// STEP 4
-// VEHICLE SELECTION + UNLOCK SYSTEM
+// STEP 5
+// SOUND + COUNTDOWN + PAUSE
 // ==========================================
 
 const canvas =
@@ -43,6 +43,24 @@ const menuBestScore =
 const menuCoins =
     document.getElementById("menuCoins");
 
+const countdown =
+    document.getElementById("countdown");
+
+const pauseBtn =
+    document.getElementById("pauseBtn");
+
+const soundBtn =
+    document.getElementById("soundBtn");
+
+const pauseScreen =
+    document.getElementById("pauseScreen");
+
+const resumeBtn =
+    document.getElementById("resumeBtn");
+
+const quitBtn =
+    document.getElementById("quitBtn");
+
 
 // ==========================================
 // CANVAS
@@ -53,6 +71,7 @@ let W =
 
 let H =
     window.innerHeight;
+
 
 function resizeCanvas() {
 
@@ -65,10 +84,12 @@ function resizeCanvas() {
         window.innerHeight;
 }
 
+
 window.addEventListener(
     "resize",
     resizeCanvas
 );
+
 
 resizeCanvas();
 
@@ -98,6 +119,7 @@ const vehicles = {
         height: 42
     },
 
+
     suv: {
 
         name: "BLUE SUV",
@@ -116,6 +138,7 @@ const vehicles = {
 
         height: 46
     },
+
 
     bike: {
 
@@ -172,6 +195,12 @@ let bestDistance =
     ) || 0;
 
 
+let soundEnabled =
+    localStorage.getItem(
+        "priyanshuHillSound"
+    ) !== "off";
+
+
 // ==========================================
 // GAME STATE
 // ==========================================
@@ -179,6 +208,10 @@ let bestDistance =
 let gameRunning = false;
 
 let gameOver = false;
+
+let paused = false;
+
+let countdownActive = false;
 
 let distance = 0;
 
@@ -197,6 +230,417 @@ let gasPressed = false;
 let brakePressed = false;
 
 let lastTime = 0;
+
+
+// ==========================================
+// AUDIO
+// ==========================================
+
+let audioContext = null;
+
+let engineOscillator = null;
+
+let engineGain = null;
+
+
+function initAudio() {
+
+    if (!soundEnabled) {
+        return;
+    }
+
+    if (!audioContext) {
+
+        audioContext =
+            new (
+                window.AudioContext ||
+                window.webkitAudioContext
+            )();
+    }
+
+    if (
+        audioContext.state ===
+        "suspended"
+    ) {
+
+        audioContext.resume();
+    }
+}
+
+
+function playTone(
+    frequency,
+    duration,
+    type = "sine",
+    volume = 0.08
+) {
+
+    if (!soundEnabled) {
+        return;
+    }
+
+    initAudio();
+
+    if (!audioContext) {
+        return;
+    }
+
+
+    const oscillator =
+        audioContext.createOscillator();
+
+    const gain =
+        audioContext.createGain();
+
+
+    oscillator.type =
+        type;
+
+    oscillator.frequency.value =
+        frequency;
+
+
+    gain.gain.setValueAtTime(
+        volume,
+        audioContext.currentTime
+    );
+
+
+    gain.gain.exponentialRampToValueAtTime(
+        0.001,
+        audioContext.currentTime +
+        duration
+    );
+
+
+    oscillator.connect(gain);
+
+    gain.connect(
+        audioContext.destination
+    );
+
+
+    oscillator.start();
+
+    oscillator.stop(
+        audioContext.currentTime +
+        duration
+    );
+}
+
+
+// ==========================================
+// ENGINE SOUND
+// ==========================================
+
+function startEngineSound() {
+
+    if (!soundEnabled) {
+        return;
+    }
+
+    initAudio();
+
+    if (!audioContext) {
+        return;
+    }
+
+    stopEngineSound();
+
+
+    engineOscillator =
+        audioContext.createOscillator();
+
+    engineGain =
+        audioContext.createGain();
+
+
+    engineOscillator.type =
+        "sawtooth";
+
+
+    engineOscillator.frequency.value =
+        80;
+
+
+    engineGain.gain.value =
+        0.025;
+
+
+    engineOscillator.connect(
+        engineGain
+    );
+
+
+    engineGain.connect(
+        audioContext.destination
+    );
+
+
+    engineOscillator.start();
+}
+
+
+function updateEngineSound() {
+
+    if (
+        !engineOscillator ||
+        !engineGain ||
+        !audioContext
+    ) {
+
+        return;
+    }
+
+
+    const targetFrequency =
+
+        70 +
+        Math.abs(car.vx) *
+        0.35;
+
+
+    engineOscillator.frequency.setTargetAtTime(
+
+        targetFrequency,
+
+        audioContext.currentTime,
+
+        0.04
+    );
+
+
+    engineGain.gain.setTargetAtTime(
+
+        gasPressed
+            ? 0.045
+            : 0.018,
+
+        audioContext.currentTime,
+
+        0.06
+    );
+}
+
+
+function stopEngineSound() {
+
+    if (
+        engineOscillator
+    ) {
+
+        try {
+            engineOscillator.stop();
+        } catch (e) {}
+
+        engineOscillator =
+            null;
+    }
+
+    engineGain =
+        null;
+}
+
+
+// ==========================================
+// SOUND BUTTON
+// ==========================================
+
+soundBtn.addEventListener(
+    "click",
+    () => {
+
+        soundEnabled =
+            !soundEnabled;
+
+
+        localStorage.setItem(
+            "priyanshuHillSound",
+            soundEnabled
+                ? "on"
+                : "off"
+        );
+
+
+        soundBtn.textContent =
+            soundEnabled
+                ? "🔊"
+                : "🔇";
+
+
+        if (
+            soundEnabled
+        ) {
+
+            initAudio();
+
+            playTone(
+                700,
+                0.12,
+                "sine",
+                0.06
+            );
+
+            if (
+                gameRunning &&
+                !paused &&
+                !countdownActive
+            ) {
+
+                startEngineSound();
+            }
+
+        } else {
+
+            stopEngineSound();
+        }
+    }
+);
+
+
+soundBtn.textContent =
+    soundEnabled
+        ? "🔊"
+        : "🔇";
+
+
+// ==========================================
+// TERRAIN
+// ==========================================
+
+const terrain = [];
+
+
+function generateTerrain() {
+
+    terrain.length = 0;
+
+
+    for (
+        let x = 0;
+        x < 20000;
+        x += 20
+    ) {
+
+        const y =
+
+            H * 0.68 +
+
+            Math.sin(
+                x * 0.004
+            ) * 65 +
+
+            Math.sin(
+                x * 0.009
+            ) * 25 +
+
+            Math.sin(
+                x * 0.018
+            ) * 12;
+
+
+        terrain.push({
+            x: x,
+            y: y
+        });
+    }
+}
+
+
+generateTerrain();
+
+
+function getGroundY(
+    worldX
+) {
+
+    if (
+        worldX < 0
+    ) {
+
+        return H * 0.68;
+    }
+
+
+    let index =
+        Math.floor(
+            worldX / 20
+        );
+
+
+    if (
+        index < 0
+    ) {
+
+        index = 0;
+    }
+
+
+    if (
+        index >=
+        terrain.length - 1
+    ) {
+
+        index =
+            terrain.length - 2;
+    }
+
+
+    const p1 =
+        terrain[index];
+
+    const p2 =
+        terrain[index + 1];
+
+
+    const ratio =
+
+        (
+            worldX -
+            p1.x
+        ) /
+        (
+            p2.x -
+            p1.x
+        );
+
+
+    return (
+
+        p1.y +
+
+        (
+            p2.y -
+            p1.y
+        ) *
+
+        ratio
+
+    );
+}
+
+
+function getGroundAngle(
+    worldX
+) {
+
+    const y1 =
+        getGroundY(
+            worldX - 10
+        );
+
+
+    const y2 =
+        getGroundY(
+            worldX + 10
+        );
+
+
+    return Math.atan2(
+        y2 - y1,
+        20
+    );
+}
 
 
 // ==========================================
@@ -232,115 +676,6 @@ const car = {
 
 
 // ==========================================
-// TERRAIN
-// ==========================================
-
-const terrain = [];
-
-
-function generateTerrain() {
-
-    terrain.length = 0;
-
-    for (
-        let x = 0;
-        x < 20000;
-        x += 20
-    ) {
-
-        const y =
-
-            H * 0.68 +
-
-            Math.sin(
-                x * 0.004
-            ) * 65 +
-
-            Math.sin(
-                x * 0.009
-            ) * 25 +
-
-            Math.sin(
-                x * 0.018
-            ) * 12;
-
-        terrain.push({
-            x: x,
-            y: y
-        });
-    }
-}
-
-
-generateTerrain();
-
-
-function getGroundY(worldX) {
-
-    if (worldX < 0) {
-
-        return H * 0.68;
-    }
-
-    let index =
-        Math.floor(
-            worldX / 20
-        );
-
-    if (index < 0) {
-        index = 0;
-    }
-
-    if (
-        index >=
-        terrain.length - 1
-    ) {
-
-        index =
-            terrain.length - 2;
-    }
-
-    const p1 =
-        terrain[index];
-
-    const p2 =
-        terrain[index + 1];
-
-    const ratio =
-
-        (worldX - p1.x) /
-        (p2.x - p1.x);
-
-    return (
-
-        p1.y +
-        (p2.y - p1.y) *
-        ratio
-
-    );
-}
-
-
-function getGroundAngle(worldX) {
-
-    const y1 =
-        getGroundY(
-            worldX - 10
-        );
-
-    const y2 =
-        getGroundY(
-            worldX + 10
-        );
-
-    return Math.atan2(
-        y2 - y1,
-        20
-    );
-}
-
-
-// ==========================================
 // OBJECTS
 // ==========================================
 
@@ -359,8 +694,6 @@ function createObjects() {
 
     obstacles = [];
 
-
-    // COINS
 
     for (
         let x = 450;
@@ -390,8 +723,6 @@ function createObjects() {
     }
 
 
-    // FUEL
-
     for (
         let x = 900;
         x < 20000;
@@ -409,8 +740,6 @@ function createObjects() {
         });
     }
 
-
-    // ROCKS
 
     for (
         let x = 700;
@@ -447,57 +776,64 @@ function updateVehicleUI() {
             ".vehicle-card"
         );
 
-    cards.forEach(card => {
 
-        const type =
-            card.dataset.vehicle;
+    cards.forEach(
+        card => {
 
-        const vehicle =
-            vehicles[type];
+            const type =
+                card.dataset.vehicle;
 
-        const unlocked =
-            unlockedVehicles.includes(
-                type
+            const vehicle =
+                vehicles[type];
+
+            const unlocked =
+                unlockedVehicles.includes(
+                    type
+                );
+
+
+            card.classList.toggle(
+                "selected",
+                type ===
+                selectedVehicle &&
+                unlocked
             );
 
 
-        card.classList.toggle(
-            "selected",
-            type === selectedVehicle &&
-            unlocked
-        );
-
-
-        card.classList.toggle(
-            "locked",
-            !unlocked
-        );
-
-
-        const status =
-            card.querySelector(
-                ".vehicle-status"
+            card.classList.toggle(
+                "locked",
+                !unlocked
             );
 
 
-        if (!unlocked) {
+            const status =
+                card.querySelector(
+                    ".vehicle-status"
+                );
 
-            status.textContent =
-                `🔒 ${vehicle.price} COINS`;
 
-        } else if (
-            type === selectedVehicle
-        ) {
+            if (
+                !unlocked
+            ) {
 
-            status.textContent =
-                "✓ SELECTED";
+                status.textContent =
+                    `🔒 ${vehicle.price} COINS`;
 
-        } else {
+            } else if (
+                type ===
+                selectedVehicle
+            ) {
 
-            status.textContent =
-                "SELECT";
+                status.textContent =
+                    "✓ SELECTED";
+
+            } else {
+
+                status.textContent =
+                    "SELECT";
+            }
         }
-    });
+    );
 
 
     menuCoins.textContent =
@@ -506,95 +842,121 @@ function updateVehicleUI() {
 
 
 // ==========================================
-// VEHICLE CLICK
+// VEHICLE SELECTION
 // ==========================================
 
 document
-    .querySelectorAll(".vehicle-card")
-    .forEach(card => {
+    .querySelectorAll(
+        ".vehicle-card"
+    )
+    .forEach(
+        card => {
 
-        card.addEventListener(
-            "click",
-            () => {
+            card.addEventListener(
+                "click",
+                () => {
 
-                const type =
-                    card.dataset.vehicle;
+                    const type =
+                        card.dataset.vehicle;
 
-                const vehicle =
-                    vehicles[type];
+                    const vehicle =
+                        vehicles[type];
 
 
-                // ALREADY UNLOCKED
+                    if (
+                        unlockedVehicles
+                            .includes(type)
+                    ) {
 
-                if (
-                    unlockedVehicles
-                    .includes(type)
-                ) {
+                        selectedVehicle =
+                            type;
 
-                    selectedVehicle =
-                        type;
 
-                    localStorage.setItem(
-                        "priyanshuHillVehicle",
-                        type
-                    );
+                        localStorage.setItem(
+                            "priyanshuHillVehicle",
+                            type
+                        );
 
-                    updateVehicleUI();
 
-                    return;
+                        updateVehicleUI();
+
+                        return;
+                    }
+
+
+                    if (
+                        totalCoins >=
+                        vehicle.price
+                    ) {
+
+                        totalCoins -=
+                            vehicle.price;
+
+
+                        unlockedVehicles.push(
+                            type
+                        );
+
+
+                        selectedVehicle =
+                            type;
+
+
+                        localStorage.setItem(
+                            "priyanshuHillCoins",
+                            totalCoins
+                        );
+
+
+                        localStorage.setItem(
+                            "priyanshuHillUnlocked",
+                            JSON.stringify(
+                                unlockedVehicles
+                            )
+                        );
+
+
+                        localStorage.setItem(
+                            "priyanshuHillVehicle",
+                            selectedVehicle
+                        );
+
+
+                        updateVehicleUI();
+
+
+                        playTone(
+                            850,
+                            0.15,
+                            "sine",
+                            0.07
+                        );
+
+                    } else {
+
+                        playTone(
+                            180,
+                            0.18,
+                            "square",
+                            0.05
+                        );
+
+
+                        alert(
+                            `You need ${
+                                vehicle.price -
+                                totalCoins
+                            } more coins!`
+                        );
+                    }
                 }
-
-
-                // BUY VEHICLE
-
-                if (
-                    totalCoins >=
-                    vehicle.price
-                ) {
-
-                    totalCoins -=
-                        vehicle.price;
-
-                    unlockedVehicles.push(
-                        type
-                    );
-
-                    selectedVehicle =
-                        type;
-
-
-                    localStorage.setItem(
-                        "priyanshuHillCoins",
-                        totalCoins
-                    );
-
-                    localStorage.setItem(
-                        "priyanshuHillUnlocked",
-                        JSON.stringify(
-                            unlockedVehicles
-                        )
-                    );
-
-                    localStorage.setItem(
-                        "priyanshuHillVehicle",
-                        selectedVehicle
-                    );
-
-                    updateVehicleUI();
-
-                } else {
-
-                    alert(
-                        `You need ${vehicle.price - totalCoins} more coins!`
-                    );
-                }
-            }
-        );
-    });
+            );
+        }
+    );
 
 
 // ==========================================
-// RESET GAME
+// RESET
 // ==========================================
 
 function resetGame() {
@@ -627,10 +989,13 @@ function resetGame() {
 
 
     car.y =
+
         getGroundY(
             car.x
         ) -
+
         car.height -
+
         20;
 
 
@@ -658,39 +1023,155 @@ function resetGame() {
 
 
 // ==========================================
-// START
+// START GAME
 // ==========================================
 
 function startGame() {
 
+    initAudio();
+
+    stopEngineSound();
+
     resetGame();
 
-    gameRunning = true;
 
-    gameOver = false;
+    gameRunning =
+        true;
+
+    gameOver =
+        false;
+
+    paused =
+        false;
+
 
     menu.style.display =
         "none";
 
+
+    pauseScreen.style.display =
+        "none";
+
+
     hud.style.display =
         "flex";
+
 
     controls.style.display =
         "flex";
 
+
+    countdownActive =
+        true;
+
+
+    gasPressed =
+        false;
+
+    brakePressed =
+        false;
+
+
     lastTime =
         performance.now();
 
-    requestAnimationFrame(
-        gameLoop
-    );
+
+    startCountdown();
 }
 
 
-startBtn.addEventListener(
-    "click",
-    startGame
-);
+// ==========================================
+// COUNTDOWN
+// ==========================================
+
+function startCountdown() {
+
+    let number = 3;
+
+
+    countdown.style.display =
+        "flex";
+
+
+    countdown.textContent =
+        number;
+
+
+    playTone(
+        500,
+        0.15,
+        "sine",
+        0.08
+    );
+
+
+    const timer =
+        setInterval(
+            () => {
+
+                number--;
+
+
+                if (
+                    number > 0
+                ) {
+
+                    countdown.textContent =
+                        number;
+
+
+                    playTone(
+                        500,
+                        0.15,
+                        "sine",
+                        0.08
+                    );
+
+                } else {
+
+                    clearInterval(
+                        timer
+                    );
+
+
+                    countdown.textContent =
+                        "GO!";
+
+
+                    playTone(
+                        900,
+                        0.25,
+                        "square",
+                        0.09
+                    );
+
+
+                    setTimeout(
+                        () => {
+
+                            countdown.style.display =
+                                "none";
+
+                            countdownActive =
+                                false;
+
+
+                            startEngineSound();
+
+
+                            requestAnimationFrame(
+                                gameLoop
+                            );
+
+                        },
+                        500
+                    );
+                }
+
+            },
+            1000
+        );
+}
 
 
 // ==========================================
@@ -706,13 +1187,11 @@ window.addEventListener(
                 "ArrowRight" ||
 
             e.code ===
-                "KeyD" ||
-
-            e.code ===
-                "Space"
+                "KeyD"
         ) {
 
-            gasPressed = true;
+            gasPressed =
+                true;
         }
 
 
@@ -724,14 +1203,36 @@ window.addEventListener(
                 "KeyA"
         ) {
 
-            brakePressed = true;
+            brakePressed =
+                true;
+        }
+
+
+        if (
+            e.code ===
+                "KeyP"
+        ) {
+
+            togglePause();
+        }
+
+
+        if (
+            e.code ===
+                "Escape"
+        ) {
+
+            togglePause();
         }
 
 
         if (
             (
-                e.code === "Enter" ||
-                e.code === "Space"
+                e.code ===
+                    "Enter" ||
+
+                e.code ===
+                    "Space"
             ) &&
             gameOver
         ) {
@@ -751,13 +1252,11 @@ window.addEventListener(
                 "ArrowRight" ||
 
             e.code ===
-                "KeyD" ||
-
-            e.code ===
-                "Space"
+                "KeyD"
         ) {
 
-            gasPressed = false;
+            gasPressed =
+                false;
         }
 
 
@@ -769,7 +1268,8 @@ window.addEventListener(
                 "KeyA"
         ) {
 
-            brakePressed = false;
+            brakePressed =
+                false;
         }
     }
 );
@@ -846,6 +1346,125 @@ pressButton(
 
 
 // ==========================================
+// PAUSE
+// ==========================================
+
+function togglePause() {
+
+    if (
+        !gameRunning ||
+        gameOver ||
+        countdownActive
+    ) {
+
+        return;
+    }
+
+
+    if (
+        paused
+    ) {
+
+        resumeGame();
+
+    } else {
+
+        pauseGame();
+    }
+}
+
+
+function pauseGame() {
+
+    paused =
+        true;
+
+
+    gasPressed =
+        false;
+
+    brakePressed =
+        false;
+
+
+    pauseScreen.style.display =
+        "flex";
+
+
+    stopEngineSound();
+}
+
+
+function resumeGame() {
+
+    paused =
+        false;
+
+
+    pauseScreen.style.display =
+        "none";
+
+
+    lastTime =
+        performance.now();
+
+
+    startEngineSound();
+
+
+    requestAnimationFrame(
+        gameLoop
+    );
+}
+
+
+pauseBtn.addEventListener(
+    "click",
+    togglePause
+);
+
+
+resumeBtn.addEventListener(
+    "click",
+    resumeGame
+);
+
+
+quitBtn.addEventListener(
+    "click",
+    () => {
+
+        gameRunning =
+            false;
+
+        paused =
+            false;
+
+        countdownActive =
+            false;
+
+        stopEngineSound();
+
+
+        pauseScreen.style.display =
+            "none";
+
+
+        hud.style.display =
+            "none";
+
+
+        controls.style.display =
+            "none";
+
+
+        menu.style.display =
+            "flex";
+    }
+);
+
+
+// ==========================================
 // PHYSICS
 // ==========================================
 
@@ -859,7 +1478,7 @@ function updatePhysics(dt) {
         1450;
 
 
-    // ACCELERATION
+    // ENGINE
 
     if (
         gasPressed &&
@@ -870,6 +1489,7 @@ function updatePhysics(dt) {
             vehicle.acceleration *
             dt;
 
+
         fuel -=
             vehicle.fuelUsage *
             dt;
@@ -878,7 +1498,9 @@ function updatePhysics(dt) {
 
     // BRAKE
 
-    if (brakePressed) {
+    if (
+        brakePressed
+    ) {
 
         car.vx -=
             650 *
@@ -937,6 +1559,7 @@ function updatePhysics(dt) {
     car.x +=
         car.vx *
         dt;
+
 
     car.y +=
         car.vy *
@@ -1064,7 +1687,10 @@ function updatePhysics(dt) {
         Math.max(
             distance,
             Math.floor(
-                (car.x - 180) /
+                (
+                    car.x -
+                    180
+                ) /
                 10
             )
         );
@@ -1081,7 +1707,8 @@ function updatePhysics(dt) {
 
 
         if (
-            car.invincibleTimer <= 0
+            car.invincibleTimer <=
+            0
         ) {
 
             car.invincible =
@@ -1120,6 +1747,8 @@ function updatePhysics(dt) {
     checkObstacles();
 
     updateHUD();
+
+    updateEngineSound();
 }
 
 
@@ -1136,6 +1765,7 @@ function checkCoins() {
         if (
             coin.collected
         ) {
+
             continue;
         }
 
@@ -1145,6 +1775,7 @@ function checkCoins() {
             getGroundY(
                 coin.x
             ) +
+
             coin.yOffset;
 
 
@@ -1162,6 +1793,7 @@ function checkCoins() {
                     car.y +
                     car.height / 2
                 ) -
+
                 coinY
             );
 
@@ -1174,6 +1806,7 @@ function checkCoins() {
             coin.collected =
                 true;
 
+
             coins++;
 
             totalCoins++;
@@ -1182,6 +1815,29 @@ function checkCoins() {
             localStorage.setItem(
                 "priyanshuHillCoins",
                 totalCoins
+            );
+
+
+            playTone(
+                1000,
+                0.12,
+                "sine",
+                0.07
+            );
+
+
+            setTimeout(
+                () => {
+
+                    playTone(
+                        1400,
+                        0.1,
+                        "sine",
+                        0.05
+                    );
+
+                },
+                60
             );
         }
     }
@@ -1201,6 +1857,7 @@ function checkFuel() {
         if (
             item.collected
         ) {
+
             continue;
         }
 
@@ -1208,7 +1865,8 @@ function checkFuel() {
         const fuelY =
             getGroundY(
                 item.x
-            ) - 55;
+            ) -
+            55;
 
 
         const dx =
@@ -1233,6 +1891,7 @@ function checkFuel() {
             item.collected =
                 true;
 
+
             fuel += 30;
 
 
@@ -1242,6 +1901,29 @@ function checkFuel() {
 
                 fuel = 100;
             }
+
+
+            playTone(
+                600,
+                0.12,
+                "sine",
+                0.07
+            );
+
+
+            setTimeout(
+                () => {
+
+                    playTone(
+                        900,
+                        0.15,
+                        "sine",
+                        0.06
+                    );
+
+                },
+                80
+            );
         }
     }
 }
@@ -1260,6 +1942,7 @@ function checkObstacles() {
         if (
             rock.hit
         ) {
+
             continue;
         }
 
@@ -1297,6 +1980,7 @@ function checkObstacles() {
             rock.hit =
                 true;
 
+
             crash();
         }
     }
@@ -1317,14 +2001,42 @@ function crash() {
     car.invincibleTimer =
         2;
 
+
     car.vx *=
         0.45;
+
 
     car.vy =
         -450;
 
+
     car.bounce =
         0.7;
+
+
+    // CRASH SOUND
+
+    playTone(
+        100,
+        0.25,
+        "sawtooth",
+        0.12
+    );
+
+
+    setTimeout(
+        () => {
+
+            playTone(
+                65,
+                0.2,
+                "square",
+                0.08
+            );
+
+        },
+        100
+    );
 
 
     if (
@@ -1333,7 +2045,9 @@ function crash() {
 
         setTimeout(
             () => {
+
                 endGame();
+
             },
             700
         );
@@ -1361,7 +2075,9 @@ function updateHUD() {
     fuelText.textContent =
         Math.max(
             0,
-            Math.floor(fuel)
+            Math.floor(
+                fuel
+            )
         );
 
 
@@ -1419,9 +2135,8 @@ function drawSky() {
     );
 
 
-    // SUN
-
     ctx.beginPath();
+
 
     ctx.arc(
         W - 100,
@@ -1434,6 +2149,7 @@ function drawSky() {
 
     ctx.fillStyle =
         "rgba(255,220,90,0.95)";
+
 
     ctx.fill();
 }
@@ -1451,10 +2167,12 @@ function drawCloud(
 
     ctx.save();
 
+
     ctx.translate(
         x,
         y
     );
+
 
     ctx.scale(
         scale,
@@ -1467,6 +2185,7 @@ function drawCloud(
 
 
     ctx.beginPath();
+
 
     ctx.arc(
         0,
@@ -1497,6 +2216,7 @@ function drawCloud(
 
     ctx.fill();
 
+
     ctx.restore();
 }
 
@@ -1505,7 +2225,8 @@ function drawClouds() {
 
     drawCloud(
         120 -
-        cameraX * 0.08,
+        cameraX *
+        0.08,
         100,
         1
     );
@@ -1513,7 +2234,8 @@ function drawClouds() {
 
     drawCloud(
         500 -
-        cameraX * 0.05,
+        cameraX *
+        0.05,
         170,
         0.8
     );
@@ -1521,7 +2243,8 @@ function drawClouds() {
 
     drawCloud(
         850 -
-        cameraX * 0.04,
+        cameraX *
+        0.04,
         80,
         1.1
     );
@@ -1539,6 +2262,7 @@ function drawMountains() {
 
 
     ctx.beginPath();
+
 
     ctx.moveTo(
         0,
@@ -1581,12 +2305,15 @@ function drawMountains() {
         H
     );
 
+
     ctx.lineTo(
         0,
         H
     );
 
+
     ctx.closePath();
+
 
     ctx.fill();
 }
@@ -1599,6 +2326,7 @@ function drawMountains() {
 function drawTerrain() {
 
     ctx.beginPath();
+
 
     ctx.moveTo(
         -20,
@@ -1642,10 +2370,9 @@ function drawTerrain() {
     ctx.fillStyle =
         "#5c4033";
 
+
     ctx.fill();
 
-
-    // GRASS
 
     ctx.beginPath();
 
@@ -1689,15 +2416,17 @@ function drawTerrain() {
     ctx.strokeStyle =
         "#43a047";
 
+
     ctx.lineWidth =
         12;
+
 
     ctx.stroke();
 }
 
 
 // ==========================================
-// COIN DRAW
+// COINS DRAW
 // ==========================================
 
 function drawCoins() {
@@ -1709,6 +2438,7 @@ function drawCoins() {
         if (
             coin.collected
         ) {
+
             continue;
         }
 
@@ -1732,6 +2462,7 @@ function drawCoins() {
             getGroundY(
                 coin.x
             ) +
+
             coin.yOffset;
 
 
@@ -1767,6 +2498,7 @@ function drawCoins() {
 
         ctx.beginPath();
 
+
         ctx.arc(
             0,
             0,
@@ -1779,14 +2511,17 @@ function drawCoins() {
         ctx.fillStyle =
             "#ffd700";
 
+
         ctx.fill();
 
 
         ctx.strokeStyle =
             "#c58c00";
 
+
         ctx.lineWidth =
             3;
+
 
         ctx.stroke();
 
@@ -1797,7 +2532,7 @@ function drawCoins() {
 
 
 // ==========================================
-// FUEL DRAW
+// FUEL
 // ==========================================
 
 function drawFuelItems() {
@@ -1809,6 +2544,7 @@ function drawFuelItems() {
         if (
             item.collected
         ) {
+
             continue;
         }
 
@@ -1830,7 +2566,8 @@ function drawFuelItems() {
         const y =
             getGroundY(
                 item.x
-            ) - 50;
+            ) -
+            50;
 
 
         ctx.save();
@@ -1891,7 +2628,7 @@ function drawFuelItems() {
 
 
 // ==========================================
-// OBSTACLES DRAW
+// OBSTACLES
 // ==========================================
 
 function drawObstacles() {
@@ -1903,6 +2640,7 @@ function drawObstacles() {
         if (
             rock.hit
         ) {
+
             continue;
         }
 
@@ -1979,7 +2717,7 @@ function drawObstacles() {
 
 
 // ==========================================
-// DRAW CAR
+// CAR
 // ==========================================
 
 function drawCar() {
@@ -1987,6 +2725,7 @@ function drawCar() {
     const screenX =
         car.x -
         cameraX;
+
 
     const screenY =
         car.y;
@@ -2006,8 +2745,6 @@ function drawCar() {
     );
 
 
-    // FLASH AFTER CRASH
-
     if (
         car.invincible &&
         Math.floor(
@@ -2021,43 +2758,21 @@ function drawCar() {
     }
 
 
-    const vehicle =
-        selectedVehicle;
-
-
-    // ======================================
-    // RED CAR
-    // ======================================
-
     if (
-        vehicle === "car"
+        selectedVehicle ===
+        "car"
     ) {
 
         drawRedCar();
 
-    }
-
-
-    // ======================================
-    // BLUE SUV
-    // ======================================
-
-    if (
-        vehicle === "suv"
+    } else if (
+        selectedVehicle ===
+        "suv"
     ) {
 
         drawBlueSUV();
 
-    }
-
-
-    // ======================================
-    // BIKE
-    // ======================================
-
-    if (
-        vehicle === "bike"
-    ) {
+    } else {
 
         drawBike();
     }
@@ -2072,31 +2787,6 @@ function drawCar() {
 // ==========================================
 
 function drawRedCar() {
-
-    // SHADOW
-
-    ctx.fillStyle =
-        "rgba(0,0,0,0.25)";
-
-
-    ctx.beginPath();
-
-
-    ctx.ellipse(
-        0,
-        car.height + 15,
-        48,
-        8,
-        0,
-        0,
-        Math.PI * 2
-    );
-
-
-    ctx.fill();
-
-
-    // BODY
 
     ctx.fillStyle =
         "#e53935";
@@ -2116,8 +2806,6 @@ function drawRedCar() {
 
     ctx.fill();
 
-
-    // CABIN
 
     ctx.fillStyle =
         "#263238";
@@ -2155,8 +2843,6 @@ function drawRedCar() {
 
     ctx.fill();
 
-
-    // WINDOW
 
     ctx.fillStyle =
         "#90caf9";
@@ -2209,12 +2895,10 @@ function drawRedCar() {
 
 
 // ==========================================
-// BLUE SUV
+// SUV
 // ==========================================
 
 function drawBlueSUV() {
-
-    // BODY
 
     ctx.fillStyle =
         "#1565c0";
@@ -2234,8 +2918,6 @@ function drawBlueSUV() {
 
     ctx.fill();
 
-
-    // ROOF
 
     ctx.fillStyle =
         "#0d47a1";
@@ -2274,8 +2956,6 @@ function drawBlueSUV() {
     ctx.fill();
 
 
-    // WINDOWS
-
     ctx.fillStyle =
         "#90caf9";
 
@@ -2293,20 +2973,6 @@ function drawBlueSUV() {
         -49,
         13,
         14
-    );
-
-
-    // BUMPER
-
-    ctx.fillStyle =
-        "#263238";
-
-
-    ctx.fillRect(
-        40,
-        -5,
-        12,
-        10
     );
 
 
@@ -2329,15 +2995,11 @@ function drawBlueSUV() {
 
 function drawBike() {
 
-    // REAR WHEEL
-
     drawBikeWheel(
         -25,
         8
     );
 
-
-    // FRONT WHEEL
 
     drawBikeWheel(
         28,
@@ -2345,10 +3007,9 @@ function drawBike() {
     );
 
 
-    // FRAME
-
     ctx.strokeStyle =
         "#ff1744";
+
 
     ctx.lineWidth =
         5;
@@ -2384,8 +3045,6 @@ function drawBike() {
     ctx.stroke();
 
 
-    // SEAT
-
     ctx.fillStyle =
         "#212121";
 
@@ -2397,36 +3056,6 @@ function drawBike() {
         5
     );
 
-
-    // HANDLE
-
-    ctx.strokeStyle =
-        "#212121";
-
-
-    ctx.lineWidth =
-        4;
-
-
-    ctx.beginPath();
-
-
-    ctx.moveTo(
-        20,
-        -10
-    );
-
-
-    ctx.lineTo(
-        31,
-        -20
-    );
-
-
-    ctx.stroke();
-
-
-    // RIDER
 
     ctx.fillStyle =
         "#ffcc80";
@@ -2461,40 +3090,7 @@ function drawBike() {
 
 
 // ==========================================
-// BIKE WHEEL
-// ==========================================
-
-function drawBikeWheel(
-    x,
-    y
-) {
-
-    ctx.beginPath();
-
-
-    ctx.arc(
-        x,
-        y,
-        12,
-        0,
-        Math.PI * 2
-    );
-
-
-    ctx.strokeStyle =
-        "#151515";
-
-
-    ctx.lineWidth =
-        4;
-
-
-    ctx.stroke();
-}
-
-
-// ==========================================
-// NORMAL WHEEL
+// WHEELS
 // ==========================================
 
 function drawWheel(
@@ -2531,57 +3127,51 @@ function drawWheel(
     ctx.fillStyle =
         "#151515";
 
+
     ctx.fill();
 
 
     ctx.strokeStyle =
-        "#555";
+        "#777";
+
 
     ctx.lineWidth =
         3;
 
+
     ctx.stroke();
 
 
+    ctx.restore();
+}
+
+
+function drawBikeWheel(
+    x,
+    y
+) {
+
+    ctx.beginPath();
+
+
+    ctx.arc(
+        x,
+        y,
+        12,
+        0,
+        Math.PI * 2
+    );
+
+
     ctx.strokeStyle =
-        "#bbb";
+        "#151515";
+
 
     ctx.lineWidth =
-        2;
+        4;
 
 
-    for (
-        let i = 0;
-        i < 4;
-        i++
-    ) {
-
-        const a =
-            i *
-            Math.PI /
-            2;
-
-
-        ctx.beginPath();
-
-
-        ctx.moveTo(
-            0,
-            0
-        );
-
-
-        ctx.lineTo(
-            Math.cos(a) * 9,
-            Math.sin(a) * 9
-        );
-
-
-        ctx.stroke();
-    }
-
-
-    ctx.restore();
+    ctx.stroke();
 }
 
 
@@ -2596,10 +3186,6 @@ function drawLives() {
 
     ctx.font =
         "bold 24px Arial";
-
-
-    ctx.textAlign =
-        "left";
 
 
     ctx.fillStyle =
@@ -2620,7 +3206,7 @@ function drawLives() {
 
 
 // ==========================================
-// GAME DRAW
+// DRAW GAME
 // ==========================================
 
 function drawGame() {
@@ -2654,7 +3240,9 @@ function gameLoop(
 ) {
 
     if (
-        !gameRunning
+        !gameRunning ||
+        paused ||
+        countdownActive
     ) {
 
         return;
@@ -2712,8 +3300,12 @@ function endGame() {
     gameRunning =
         false;
 
+
     gameOver =
         true;
+
+
+    stopEngineSound();
 
 
     if (
@@ -2758,11 +3350,6 @@ function showGameOverScreen() {
         menu.querySelector(
             ".menu-card"
         );
-
-
-    if (!card) {
-        return;
-    }
 
 
     card.innerHTML = `
@@ -2842,5 +3429,11 @@ menuCoins.textContent =
 
 updateVehicleUI();
 
-
 updateHUD();
+
+
+// ==========================================
+// FIRST DRAW
+// ==========================================
+
+drawGame();
