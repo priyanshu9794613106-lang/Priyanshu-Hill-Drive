@@ -9,359 +9,773 @@
 
 <body>
 
-    <!-- ================= MENU ================= -->
-    <div id="menu">
+<!-- ================= MAIN MENU ================= -->
 
-        <div class="menu-card">
+<div id="menu">
 
-            <div class="game-icon">🚗</div>
+    <div class="menu-card">
 
-            <h1>PRIYANSHU</h1>
-            <h2>HILL DRIVE</h2>
+        <div class="game-icon">🚗</div>
 
-            <p class="developer">
-                Developed by <strong>Priyanshu Mishra</strong>
-            </p>
+        <h1>PRIYANSHU</h1>
+        <h2>HILL DRIVE</h2>
 
-            <div class="top-stats">
+        <p class="developer">
+            Developed by <strong>Priyanshu Mishra</strong>
+        </p>
 
-                <div class="stat-box">
-                    🏆 Best
+
+        <!-- TOP STATS -->
+
+        <div class="top-stats">
+
+            <div class="stat-box">
+                🏆 BEST
+                <strong>
+                    <span id="menuBestScore">0</span> m
+                </strong>
+            </div>
+
+            <div class="stat-box">
+                🪙 COINS
+                <strong id="menuCoins">0</strong>
+            </div>
+
+        </div>
+
+
+        <!-- DAILY REWARD -->
+
+        <div class="daily-reward">
+
+            <div class="daily-left">
+
+                <div class="daily-icon">
+                    🎁
+                </div>
+
+                <div>
+
                     <strong>
-                        <span id="menuBestScore">0</span> m
+                        DAILY REWARD
                     </strong>
-                </div>
 
-                <div class="stat-box">
-                    🪙 Coins
-                    <strong id="menuCoins">0</strong>
+                    <small id="dailyStatus">
+                        20 Coins Available
+                    </small>
+
                 </div>
 
             </div>
 
-            <!-- VEHICLES -->
-            <div class="section-title">
-                🚘 SELECT VEHICLE
-            </div>
+            <button id="dailyRewardBtn">
+                CLAIM
+            </button>
 
-            <div id="vehicleSelection">
-
-                <button class="vehicle-card selected" data-vehicle="car">
-
-                    <div class="vehicle-emoji">🚗</div>
-
-                    <strong>RED RACER</strong>
-
-                    <small>Balanced</small>
-
-                    <span class="vehicle-status">
-                        SELECTED
-                    </span>
-
-                </button>
-
-                <button class="vehicle-card locked" data-vehicle="suv">
-
-                    <div class="vehicle-emoji">🚙</div>
-
-                    <strong>BLUE SUV</strong>
-
-                    <small>High Power</small>
-
-                    <span class="vehicle-status">
-                        🔒 50 COINS
-                    </span>
-
-                </button>
-
-                <button class="vehicle-card locked" data-vehicle="bike">
-
-                    <div class="vehicle-emoji">🏍️</div>
-
-                    <strong>HILL BIKE</strong>
-
-                    <small>Super Fast</small>
-
-                    <span class="vehicle-status">
-                        🔒 100 COINS
-                    </span>
-
-                </button>
-
-            </div>
+        </div>
 
 
-            <!-- GARAGE -->
-            <div class="garage">
+        <!-- VEHICLE -->
 
-                <div class="garage-header">
+        <div class="section-title">
+            🚘 SELECT VEHICLE
+        </div>
 
-                    <div>
-                        <div class="section-title garage-title">
-                            🔧 GARAGE
-                        </div>
 
-                        <div class="garage-subtitle">
-                            Upgrade your vehicle
-                        </div>
+        <div id="vehicleSelection">
+
+            <button
+                class="vehicle-card selected"
+                data-vehicle="car"
+            >
+
+                <div class="vehicle-emoji">
+                    🚗
+                </div>
+
+                <strong>
+                    RED RACER
+                </strong>
+
+                <small>
+                    Balanced
+                </small>
+
+                <span class="vehicle-status">
+                    SELECTED
+                </span>
+
+            </button>
+
+
+            <button
+                class="vehicle-card locked"
+                data-vehicle="suv"
+            >
+
+                <div class="vehicle-emoji">
+                    🚙
+                </div>
+
+                <strong>
+                    BLUE SUV
+                </strong>
+
+                <small>
+                    High Power
+                </small>
+
+                <span class="vehicle-status">
+                    🔒 50 COINS
+                </span>
+
+            </button>
+
+
+            <button
+                class="vehicle-card locked"
+                data-vehicle="bike"
+            >
+
+                <div class="vehicle-emoji">
+                    🏍️
+                </div>
+
+                <strong>
+                    HILL BIKE
+                </strong>
+
+                <small>
+                    Super Fast
+                </small>
+
+                <span class="vehicle-status">
+                    🔒 100 COINS
+                </span>
+
+            </button>
+
+        </div>
+
+
+        <!-- GARAGE -->
+
+        <div class="garage">
+
+            <div class="garage-header">
+
+                <div>
+
+                    <div class="section-title garage-title">
+                        🔧 GARAGE
                     </div>
 
-                    <div class="garage-level">
-                        LV <span id="garageLevel">1</span>
+                    <div class="garage-subtitle">
+                        Upgrade your vehicle
                     </div>
 
                 </div>
 
+                <div class="garage-level">
+                    LV <span id="garageLevel">1</span>
+                </div>
 
-                <!-- ENGINE -->
-                <div class="upgrade-card">
+            </div>
 
-                    <div class="upgrade-icon">
-                        ⚙️
+
+            <!-- ENGINE -->
+
+            <div class="upgrade-card">
+
+                <div class="upgrade-icon">
+                    ⚙️
+                </div>
+
+                <div class="upgrade-info">
+
+                    <div class="upgrade-top">
+
+                        <strong>
+                            ENGINE
+                        </strong>
+
+                        <span>
+                            Lv
+                            <b id="engineLevel">1</b>/5
+                        </span>
+
                     </div>
 
-                    <div class="upgrade-info">
+                    <div class="progress">
+                        <span id="engineProgress"></span>
+                    </div>
 
-                        <div class="upgrade-top">
-                            <strong>ENGINE</strong>
+                    <small>
+                        More acceleration & power
+                    </small>
 
-                            <span>
-                                Lv <b id="engineLevel">1</b>/5
-                            </span>
-                        </div>
+                </div>
 
-                        <div class="progress">
-                            <span id="engineProgress"></span>
-                        </div>
+                <button
+                    class="upgrade-btn"
+                    id="engineUpgrade"
+                >
+                    🪙 <span>20</span>
+                </button>
+
+            </div>
+
+
+            <!-- TIRES -->
+
+            <div class="upgrade-card">
+
+                <div class="upgrade-icon">
+                    🛞
+                </div>
+
+                <div class="upgrade-info">
+
+                    <div class="upgrade-top">
+
+                        <strong>
+                            TIRES
+                        </strong>
+
+                        <span>
+                            Lv
+                            <b id="tireLevel">1</b>/5
+                        </span>
+
+                    </div>
+
+                    <div class="progress">
+                        <span id="tireProgress"></span>
+                    </div>
+
+                    <small>
+                        Better grip & stability
+                    </small>
+
+                </div>
+
+                <button
+                    class="upgrade-btn"
+                    id="tireUpgrade"
+                >
+                    🪙 <span>20</span>
+                </button>
+
+            </div>
+
+
+            <!-- FUEL -->
+
+            <div class="upgrade-card">
+
+                <div class="upgrade-icon">
+                    ⛽
+                </div>
+
+                <div class="upgrade-info">
+
+                    <div class="upgrade-top">
+
+                        <strong>
+                            FUEL TANK
+                        </strong>
+
+                        <span>
+                            Lv
+                            <b id="fuelLevel">1</b>/5
+                        </span>
+
+                    </div>
+
+                    <div class="progress">
+                        <span id="fuelProgress"></span>
+                    </div>
+
+                    <small>
+                        More fuel capacity
+                    </small>
+
+                </div>
+
+                <button
+                    class="upgrade-btn"
+                    id="fuelUpgrade"
+                >
+                    🪙 <span>20</span>
+                </button>
+
+            </div>
+
+
+            <!-- SPEED -->
+
+            <div class="upgrade-card">
+
+                <div class="upgrade-icon">
+                    ⚡
+                </div>
+
+                <div class="upgrade-info">
+
+                    <div class="upgrade-top">
+
+                        <strong>
+                            SPEED
+                        </strong>
+
+                        <span>
+                            Lv
+                            <b id="speedLevel">1</b>/5
+                        </span>
+
+                    </div>
+
+                    <div class="progress">
+                        <span id="speedProgress"></span>
+                    </div>
+
+                    <small>
+                        Higher maximum speed
+                    </small>
+
+                </div>
+
+                <button
+                    class="upgrade-btn"
+                    id="speedUpgrade"
+                >
+                    🪙 <span>20</span>
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- MISSIONS -->
+
+        <div class="panel">
+
+            <div class="panel-header">
+
+                <div>
+                    <div class="section-title">
+                        🎯 MISSIONS
+                    </div>
+
+                    <small>
+                        Complete missions and earn coins
+                    </small>
+                </div>
+
+                <span class="panel-count">
+                    <span id="missionCompleted">0</span>/4
+                </span>
+
+            </div>
+
+
+            <div id="missionsList">
+
+                <!-- Mission 1 -->
+
+                <div class="mission-card">
+
+                    <div class="mission-icon">
+                        🛣️
+                    </div>
+
+                    <div class="mission-info">
+
+                        <strong>
+                            Road Runner
+                        </strong>
 
                         <small>
-                            More acceleration & power
+                            Drive 1000 meters
                         </small>
+
+                        <div class="mission-progress">
+                            <span id="missionDistanceBar"></span>
+                        </div>
+
+                        <div class="mission-numbers">
+                            <span id="missionDistanceText">
+                                0 / 1000 m
+                            </span>
+
+                            <b>
+                                +30 🪙
+                            </b>
+                        </div>
 
                     </div>
 
-                    <button
-                        class="upgrade-btn"
-                        id="engineUpgrade">
-                        🪙 <span>20</span>
-                    </button>
+                    <span
+                        class="mission-status"
+                        id="missionDistanceStatus"
+                    >
+                        0%
+                    </span>
 
                 </div>
 
 
-                <!-- TIRES -->
-                <div class="upgrade-card">
+                <!-- Mission 2 -->
 
-                    <div class="upgrade-icon">
-                        🛞
+                <div class="mission-card">
+
+                    <div class="mission-icon">
+                        🪙
                     </div>
 
-                    <div class="upgrade-info">
+                    <div class="mission-info">
 
-                        <div class="upgrade-top">
-                            <strong>TIRES</strong>
-
-                            <span>
-                                Lv <b id="tireLevel">1</b>/5
-                            </span>
-                        </div>
-
-                        <div class="progress">
-                            <span id="tireProgress"></span>
-                        </div>
+                        <strong>
+                            Coin Hunter
+                        </strong>
 
                         <small>
-                            Better grip & stability
+                            Collect 25 coins
                         </small>
+
+                        <div class="mission-progress">
+                            <span id="missionCoinsBar"></span>
+                        </div>
+
+                        <div class="mission-numbers">
+                            <span id="missionCoinsText">
+                                0 / 25
+                            </span>
+
+                            <b>
+                                +40 🪙
+                            </b>
+                        </div>
 
                     </div>
 
-                    <button
-                        class="upgrade-btn"
-                        id="tireUpgrade">
-                        🪙 <span>20</span>
-                    </button>
+                    <span
+                        class="mission-status"
+                        id="missionCoinsStatus"
+                    >
+                        0%
+                    </span>
 
                 </div>
 
 
-                <!-- FUEL -->
-                <div class="upgrade-card">
+                <!-- Mission 3 -->
 
-                    <div class="upgrade-icon">
+                <div class="mission-card">
+
+                    <div class="mission-icon">
                         ⛽
                     </div>
 
-                    <div class="upgrade-info">
+                    <div class="mission-info">
 
-                        <div class="upgrade-top">
-                            <strong>FUEL TANK</strong>
-
-                            <span>
-                                Lv <b id="fuelLevel">1</b>/5
-                            </span>
-                        </div>
-
-                        <div class="progress">
-                            <span id="fuelProgress"></span>
-                        </div>
+                        <strong>
+                            Fuel Saver
+                        </strong>
 
                         <small>
-                            More fuel capacity
+                            Collect 3 fuel cans
                         </small>
+
+                        <div class="mission-progress">
+                            <span id="missionFuelBar"></span>
+                        </div>
+
+                        <div class="mission-numbers">
+                            <span id="missionFuelText">
+                                0 / 3
+                            </span>
+
+                            <b>
+                                +35 🪙
+                            </b>
+                        </div>
 
                     </div>
 
-                    <button
-                        class="upgrade-btn"
-                        id="fuelUpgrade">
-                        🪙 <span>20</span>
-                    </button>
+                    <span
+                        class="mission-status"
+                        id="missionFuelStatus"
+                    >
+                        0%
+                    </span>
 
                 </div>
 
 
-                <!-- SPEED -->
-                <div class="upgrade-card">
+                <!-- Mission 4 -->
 
-                    <div class="upgrade-icon">
-                        ⚡
+                <div class="mission-card">
+
+                    <div class="mission-icon">
+                        ❤️
                     </div>
 
-                    <div class="upgrade-info">
+                    <div class="mission-info">
 
-                        <div class="upgrade-top">
-                            <strong>SPEED</strong>
-
-                            <span>
-                                Lv <b id="speedLevel">1</b>/5
-                            </span>
-                        </div>
-
-                        <div class="progress">
-                            <span id="speedProgress"></span>
-                        </div>
+                        <strong>
+                            Survivor
+                        </strong>
 
                         <small>
-                            Higher maximum speed
+                            Finish a run with 3 lives
                         </small>
+
+                        <div class="mission-progress">
+                            <span id="missionLivesBar"></span>
+                        </div>
+
+                        <div class="mission-numbers">
+                            <span id="missionLivesText">
+                                Not completed
+                            </span>
+
+                            <b>
+                                +50 🪙
+                            </b>
+                        </div>
 
                     </div>
 
-                    <button
-                        class="upgrade-btn"
-                        id="speedUpgrade">
-                        🪙 <span>20</span>
-                    </button>
+                    <span
+                        class="mission-status"
+                        id="missionLivesStatus"
+                    >
+                        0%
+                    </span>
 
                 </div>
 
             </div>
 
+        </div>
 
-            <!-- START -->
-            <button id="startBtn">
-                ▶ START GAME
-            </button>
 
-            <p class="instruction">
-                ⌨️ Arrow Right / D = GAS
-                <br>
-                ⬅️ Arrow Left / A = BRAKE
-                <br>
-                📱 Mobile controls supported
-                <br>
-                ⏸️ P / ESC = PAUSE
-            </p>
+        <!-- ACHIEVEMENTS -->
+
+        <div class="panel">
+
+            <div class="panel-header">
+
+                <div>
+                    <div class="section-title">
+                        🏆 ACHIEVEMENTS
+                    </div>
+
+                    <small>
+                        Become a Hill Drive legend
+                    </small>
+                </div>
+
+                <span class="panel-count">
+                    <span id="achievementCompleted">0</span>/6
+                </span>
+
+            </div>
+
+
+            <div
+                id="achievementsList"
+                class="achievement-grid"
+            >
+
+                <div
+                    class="achievement-card"
+                    id="achievement1000"
+                >
+                    <div>🥉</div>
+                    <strong>Rookie</strong>
+                    <small>Reach 1000 m</small>
+                </div>
+
+
+                <div
+                    class="achievement-card"
+                    id="achievement5000"
+                >
+                    <div>🥈</div>
+                    <strong>Driver</strong>
+                    <small>Reach 5000 m</small>
+                </div>
+
+
+                <div
+                    class="achievement-card"
+                    id="achievement10000"
+                >
+                    <div>🥇</div>
+                    <strong>Champion</strong>
+                    <small>Reach 10000 m</small>
+                </div>
+
+
+                <div
+                    class="achievement-card"
+                    id="achievementCoins100"
+                >
+                    <div>💰</div>
+                    <strong>Collector</strong>
+                    <small>Own 100 coins</small>
+                </div>
+
+
+                <div
+                    class="achievement-card"
+                    id="achievementVehicles"
+                >
+                    <div>🚘</div>
+                    <strong>Garage King</strong>
+                    <small>Unlock all vehicles</small>
+                </div>
+
+
+                <div
+                    class="achievement-card"
+                    id="achievementUpgrade"
+                >
+                    <div>🔧</div>
+                    <strong>Mechanic</strong>
+                    <small>Reach 5 upgrade levels</small>
+                </div>
+
+            </div>
 
         </div>
+
+
+        <!-- START -->
+
+        <button id="startBtn">
+            ▶ START GAME
+        </button>
+
+
+        <p class="instruction">
+            ⌨️ Arrow Right / D = GAS
+            <br>
+            ⬅️ Arrow Left / A = BRAKE
+            <br>
+            📱 Mobile controls supported
+            <br>
+            ⏸️ P / ESC = PAUSE
+        </p>
 
     </div>
 
-
-    <!-- GAME -->
-    <canvas id="gameCanvas"></canvas>
+</div>
 
 
-    <!-- COUNTDOWN -->
-    <div id="countdown">
-        3
+<!-- ================= GAME ================= -->
+
+<canvas id="gameCanvas"></canvas>
+
+
+<div id="countdown">
+    3
+</div>
+
+
+<!-- HUD -->
+
+<div id="hud">
+
+    <div class="hud-item">
+        📏
+        <span id="distance">0</span> m
     </div>
 
+    <div class="hud-item">
+        🪙
+        <span id="coins">0</span>
+    </div>
 
-    <!-- HUD -->
-    <div id="hud">
+    <div class="hud-item">
+        ⛽
+        <span id="fuel">100</span>%
+    </div>
 
-        <div class="hud-item">
-            📏
-            <span id="distance">0</span> m
-        </div>
+    <div class="hud-item lives">
+        ❤️
+        <span id="lives">3</span>
+    </div>
 
-        <div class="hud-item">
-            🪙
-            <span id="coins">0</span>
-        </div>
+    <button
+        id="pauseBtn"
+        class="hud-button"
+    >
+        ⏸️
+    </button>
 
-        <div class="hud-item">
-            ⛽
-            <span id="fuel">100</span>%
-        </div>
+    <button
+        id="soundBtn"
+        class="hud-button"
+    >
+        🔊
+    </button>
 
-        <div class="hud-item lives">
-            ❤️
-            <span id="lives">3</span>
-        </div>
+</div>
 
-        <button id="pauseBtn" class="hud-button">
+
+<!-- PAUSE -->
+
+<div id="pauseScreen">
+
+    <div class="pause-card">
+
+        <div class="pause-icon">
             ⏸️
-        </button>
-
-        <button id="soundBtn" class="hud-button">
-            🔊
-        </button>
-
-    </div>
-
-
-    <!-- PAUSE -->
-    <div id="pauseScreen">
-
-        <div class="pause-card">
-
-            <div class="pause-icon">
-                ⏸️
-            </div>
-
-            <h2>GAME PAUSED</h2>
-
-            <button id="resumeBtn">
-                ▶ RESUME
-            </button>
-
-            <button id="quitBtn">
-                🏠 MAIN MENU
-            </button>
-
         </div>
 
-    </div>
+        <h2>
+            GAME PAUSED
+        </h2>
 
-
-    <!-- MOBILE CONTROLS -->
-    <div id="controls">
-
-        <button id="brakeBtn" class="control brake">
-            ◀ BRAKE
+        <button id="resumeBtn">
+            ▶ RESUME
         </button>
 
-        <button id="gasBtn" class="control gas">
-            GAS ▶
+        <button id="quitBtn">
+            🏠 MAIN MENU
         </button>
 
     </div>
 
+</div>
 
-    <script src="script.js"></script>
+
+<!-- MOBILE CONTROLS -->
+
+<div id="controls">
+
+    <button
+        id="brakeBtn"
+        class="control brake"
+    >
+        ◀ BRAKE
+    </button>
+
+    <button
+        id="gasBtn"
+        class="control gas"
+    >
+        GAS ▶
+    </button>
+
+</div>
+
+
+<script src="script.js"></script>
 
 </body>
 </html>
