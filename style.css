@@ -22,7 +22,7 @@ body {
 
 
 /* ==========================================
-   GAME CANVAS
+   CANVAS
 ========================================== */
 
 #gameCanvas {
@@ -76,10 +76,6 @@ body {
 }
 
 
-/* ==========================================
-   MENU CARD
-========================================== */
-
 .menu-card {
 
     width: min(
@@ -116,7 +112,7 @@ body {
 
 
 /* ==========================================
-   GAME ICON
+   TITLE
 ========================================== */
 
 .game-icon {
@@ -132,10 +128,6 @@ body {
         );
 }
 
-
-/* ==========================================
-   TITLE
-========================================== */
 
 .menu-card h1 {
 
@@ -169,10 +161,6 @@ body {
 }
 
 
-/* ==========================================
-   DEVELOPER
-========================================== */
-
 .developer {
 
     font-size: 15px;
@@ -184,7 +172,7 @@ body {
 
 
 /* ==========================================
-   BEST SCORE
+   SCORE
 ========================================== */
 
 .best-box {
@@ -212,10 +200,6 @@ body {
 }
 
 
-/* ==========================================
-   COINS
-========================================== */
-
 .menu-coins {
 
     display: inline-block;
@@ -242,7 +226,7 @@ body {
 
 
 /* ==========================================
-   VEHICLE TITLE
+   VEHICLES
 ========================================== */
 
 .vehicle-title {
@@ -261,10 +245,6 @@ body {
 }
 
 
-/* ==========================================
-   VEHICLE GRID
-========================================== */
-
 #vehicleSelection {
 
     display: grid;
@@ -278,19 +258,14 @@ body {
 }
 
 
-/* ==========================================
-   VEHICLE CARD
-========================================== */
-
 .vehicle-card {
-
-    position: relative;
 
     min-height: 130px;
 
     padding: 10px 5px;
 
-    border: 2px solid
+    border:
+        2px solid
         rgba(255,255,255,0.15);
 
     border-radius: 17px;
@@ -302,10 +277,7 @@ body {
 
     cursor: pointer;
 
-    transition:
-        transform 0.2s,
-        border 0.2s,
-        background 0.2s;
+    transition: 0.2s;
 }
 
 
@@ -352,8 +324,6 @@ body {
     display: block;
 
     font-size: 12px;
-
-    letter-spacing: 0.5px;
 }
 
 
@@ -417,19 +387,6 @@ body {
     box-shadow:
         0 8px 20px
         rgba(0,0,0,0.25);
-
-    transition: 0.2s;
-}
-
-
-#startBtn:hover {
-
-    transform:
-        translateY(-3px);
-
-    box-shadow:
-        0 12px 25px
-        rgba(0,0,0,0.3);
 }
 
 
@@ -439,10 +396,6 @@ body {
         scale(0.97);
 }
 
-
-/* ==========================================
-   INSTRUCTIONS
-========================================== */
 
 .instruction {
 
@@ -472,8 +425,7 @@ body {
 
     display: none;
 
-    justify-content:
-        space-between;
+    align-items: center;
 
     gap: 10px;
 
@@ -504,15 +456,181 @@ body {
     font-size: 15px;
 
     font-weight: bold;
+}
 
-    box-shadow:
-        0 5px 15px
-        rgba(0,0,0,0.2);
+
+.hud-button {
+
+    width: 44px;
+
+    height: 44px;
+
+    border: none;
+
+    border-radius: 12px;
+
+    background:
+        rgba(0,0,0,0.55);
+
+    color: white;
+
+    font-size: 20px;
+
+    cursor: pointer;
+
+    pointer-events: auto;
 }
 
 
 /* ==========================================
-   MOBILE CONTROLS
+   COUNTDOWN
+========================================== */
+
+#countdown {
+
+    position: fixed;
+
+    inset: 0;
+
+    display: none;
+
+    align-items: center;
+
+    justify-content: center;
+
+    z-index: 80;
+
+    color: white;
+
+    font-size:
+        clamp(
+            90px,
+            20vw,
+            180px
+        );
+
+    font-weight: 900;
+
+    text-shadow:
+        0 10px 30px
+        rgba(0,0,0,0.45);
+
+    pointer-events: none;
+}
+
+
+/* ==========================================
+   PAUSE
+========================================== */
+
+#pauseScreen {
+
+    position: fixed;
+
+    inset: 0;
+
+    display: none;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background:
+        rgba(0,0,0,0.65);
+
+    backdrop-filter:
+        blur(7px);
+
+    z-index: 90;
+}
+
+
+.pause-card {
+
+    width: min(
+        90%,
+        360px
+    );
+
+    padding: 35px 25px;
+
+    text-align: center;
+
+    border-radius: 25px;
+
+    background:
+        rgba(30,30,30,0.95);
+
+    color: white;
+
+    box-shadow:
+        0 20px 50px
+        rgba(0,0,0,0.4);
+}
+
+
+.pause-icon {
+
+    font-size: 55px;
+
+    margin-bottom: 10px;
+}
+
+
+.pause-card h2 {
+
+    margin-bottom: 25px;
+
+    letter-spacing: 2px;
+}
+
+
+.pause-card button {
+
+    width: 100%;
+
+    padding: 14px;
+
+    margin-top: 10px;
+
+    border: none;
+
+    border-radius: 13px;
+
+    color: white;
+
+    font-weight: 900;
+
+    font-size: 16px;
+
+    cursor: pointer;
+}
+
+
+#resumeBtn {
+
+    background:
+        linear-gradient(
+            135deg,
+            #00c853,
+            #64dd17
+        );
+}
+
+
+#quitBtn {
+
+    background:
+        linear-gradient(
+            135deg,
+            #455a64,
+            #263238
+        );
+}
+
+
+/* ==========================================
+   CONTROLS
 ========================================== */
 
 #controls {
@@ -524,7 +642,8 @@ body {
 
     bottom: 20px;
 
-    padding: 0 20px;
+    padding:
+        0 20px;
 
     display: none;
 
@@ -564,15 +683,6 @@ body {
     box-shadow:
         0 8px 20px
         rgba(0,0,0,0.3);
-
-    transition: 0.1s;
-}
-
-
-.control:active {
-
-    transform:
-        scale(0.94);
 }
 
 
@@ -654,7 +764,16 @@ body {
         padding:
             9px 10px;
 
-        font-size: 13px;
+        font-size: 12px;
+    }
+
+    .hud-button {
+
+        width: 40px;
+
+        height: 40px;
+
+        font-size: 18px;
     }
 
     #controls {
@@ -676,33 +795,13 @@ body {
 }
 
 
-/* ==========================================
-   SMALL MOBILE
-========================================== */
-
 @media (max-width: 380px) {
-
-    .menu-card {
-
-        padding:
-            20px 12px;
-    }
-
-    .vehicle-card {
-
-        min-height: 105px;
-    }
-
-    .vehicle-emoji {
-
-        font-size: 30px;
-    }
 
     .hud-item {
 
         padding: 8px;
 
-        font-size: 12px;
+        font-size: 11px;
     }
 
     .control {
