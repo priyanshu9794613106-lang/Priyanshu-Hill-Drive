@@ -39,7 +39,7 @@ button {
     align-items: center;
     justify-content: center;
 
-    padding: 15px;
+    padding: 12px;
 
     overflow-y: auto;
 
@@ -66,13 +66,13 @@ button {
 
 
 .menu-card {
-    width: min(95%, 560px);
+    width: min(96%, 590px);
 
-    max-height: 96vh;
+    max-height: 97vh;
 
     overflow-y: auto;
 
-    padding: 28px 22px;
+    padding: 26px 20px;
 
     text-align: center;
 
@@ -81,36 +81,40 @@ button {
     background:
         linear-gradient(
             145deg,
-            rgba(20,20,30,0.72),
-            rgba(0,0,0,0.42)
+            rgba(20,20,30,0.75),
+            rgba(0,0,0,0.45)
         );
 
     backdrop-filter: blur(20px);
 
-    border: 1px solid rgba(255,255,255,0.2);
+    border:
+        1px solid
+        rgba(255,255,255,0.2);
 
     box-shadow:
-        0 30px 70px rgba(0,0,0,0.4),
-        inset 0 1px rgba(255,255,255,0.15);
+        0 30px 70px
+        rgba(0,0,0,0.4);
 
     color: white;
 }
 
 
 .game-icon {
-    font-size: 55px;
+    font-size: 50px;
 
-    margin-bottom: 4px;
+    margin-bottom: 3px;
 
     filter:
         drop-shadow(
-            0 8px 8px rgba(0,0,0,0.35)
+            0 8px 8px
+            rgba(0,0,0,0.35)
         );
 }
 
 
 .menu-card h1 {
-    font-size: clamp(27px, 6vw, 44px);
+    font-size:
+        clamp(26px, 6vw, 43px);
 
     letter-spacing: 4px;
 
@@ -119,22 +123,23 @@ button {
 
 
 .menu-card h2 {
-    font-size: clamp(22px, 5vw, 35px);
+    font-size:
+        clamp(21px, 5vw, 34px);
 
     letter-spacing: 5px;
 
     color: #ffd54f;
 
-    margin-bottom: 8px;
+    margin-bottom: 7px;
 }
 
 
 .developer {
-    font-size: 14px;
+    font-size: 13px;
 
     opacity: 0.85;
 
-    margin-bottom: 14px;
+    margin-bottom: 12px;
 }
 
 
@@ -147,24 +152,21 @@ button {
 
     gap: 8px;
 
-    margin-bottom: 13px;
+    margin-bottom: 10px;
 }
 
 
 .stat-box {
-    min-width: 145px;
+    min-width: 135px;
 
-    padding: 10px 15px;
+    padding: 9px 13px;
 
-    border-radius: 14px;
+    border-radius: 13px;
 
     background:
         rgba(255,255,255,0.09);
 
-    border:
-        1px solid rgba(255,255,255,0.08);
-
-    font-size: 13px;
+    font-size: 12px;
 }
 
 
@@ -175,7 +177,120 @@ button {
 
     color: #ffd54f;
 
-    font-size: 17px;
+    font-size: 16px;
+}
+
+
+/* ================= DAILY REWARD ================= */
+
+.daily-reward {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 10px;
+
+    padding: 10px 12px;
+
+    margin-bottom: 14px;
+
+    border-radius: 15px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,193,7,0.16),
+            rgba(255,255,255,0.06)
+        );
+
+    border:
+        1px solid
+        rgba(255,213,79,0.2);
+}
+
+
+.daily-left {
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    text-align: left;
+}
+
+
+.daily-icon {
+    width: 38px;
+    height: 38px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 11px;
+
+    background:
+        rgba(255,213,79,0.15);
+
+    font-size: 21px;
+}
+
+
+.daily-left strong {
+    display: block;
+
+    font-size: 11px;
+
+    color: #ffd54f;
+}
+
+
+.daily-left small {
+    display: block;
+
+    margin-top: 3px;
+
+    font-size: 9px;
+
+    opacity: 0.6;
+}
+
+
+#dailyRewardBtn {
+    padding: 9px 15px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ffb300,
+            #ffd54f
+        );
+
+    color: #222;
+
+    font-size: 10px;
+
+    font-weight: 900;
+
+    cursor: pointer;
+}
+
+
+#dailyRewardBtn.claimed {
+    background:
+        rgba(255,255,255,0.1);
+
+    color: white;
+
+    cursor: default;
 }
 
 
@@ -192,30 +307,32 @@ button {
 }
 
 
+/* ================= VEHICLES ================= */
+
 #vehicleSelection {
     display: grid;
 
     grid-template-columns:
         repeat(3, 1fr);
 
-    gap: 8px;
+    gap: 7px;
 
-    margin-top: 9px;
+    margin-top: 8px;
 
-    margin-bottom: 16px;
+    margin-bottom: 14px;
 }
 
 
 .vehicle-card {
-    min-height: 120px;
+    min-height: 112px;
 
-    padding: 9px 5px;
+    padding: 8px 4px;
 
     border:
         2px solid
         rgba(255,255,255,0.12);
 
-    border-radius: 17px;
+    border-radius: 16px;
 
     background:
         rgba(255,255,255,0.07);
@@ -230,9 +347,6 @@ button {
 
 .vehicle-card:hover {
     transform: translateY(-3px);
-
-    background:
-        rgba(255,255,255,0.14);
 }
 
 
@@ -243,7 +357,7 @@ button {
         rgba(255,213,79,0.16);
 
     box-shadow:
-        0 0 20px
+        0 0 18px
         rgba(255,213,79,0.2);
 }
 
@@ -254,7 +368,7 @@ button {
 
 
 .vehicle-emoji {
-    font-size: 37px;
+    font-size: 34px;
 
     margin-bottom: 4px;
 }
@@ -263,7 +377,7 @@ button {
 .vehicle-card strong {
     display: block;
 
-    font-size: 11px;
+    font-size: 10px;
 }
 
 
@@ -272,18 +386,18 @@ button {
 
     margin-top: 3px;
 
-    font-size: 9px;
+    font-size: 8px;
 
-    opacity: 0.7;
+    opacity: 0.65;
 }
 
 
 .vehicle-status {
     display: block;
 
-    margin-top: 7px;
+    margin-top: 6px;
 
-    font-size: 8px;
+    font-size: 7px;
 
     font-weight: 900;
 
@@ -294,11 +408,11 @@ button {
 /* ================= GARAGE ================= */
 
 .garage {
-    padding: 14px;
+    padding: 12px;
 
-    margin-top: 3px;
+    margin-bottom: 13px;
 
-    border-radius: 20px;
+    border-radius: 19px;
 
     background:
         rgba(0,0,0,0.22);
@@ -312,18 +426,16 @@ button {
 .garage-header {
     display: flex;
 
-    justify-content: space-between;
-
     align-items: center;
 
-    margin-bottom: 10px;
+    justify-content: space-between;
+
+    margin-bottom: 8px;
 }
 
 
 .garage-title {
     text-align: left;
-
-    font-size: 13px;
 
     color: #ffd54f;
 }
@@ -334,59 +446,49 @@ button {
 
     margin-top: 2px;
 
-    font-size: 10px;
+    font-size: 9px;
 
-    opacity: 0.55;
+    opacity: 0.5;
 }
 
 
 .garage-level {
-    padding: 7px 11px;
+    padding: 6px 10px;
 
-    border-radius: 10px;
+    border-radius: 9px;
 
     background:
-        rgba(255,213,79,0.16);
-
-    border:
-        1px solid
-        rgba(255,213,79,0.25);
+        rgba(255,213,79,0.14);
 
     color: #ffd54f;
 
-    font-size: 12px;
+    font-size: 11px;
 
     font-weight: 900;
 }
 
-
-/* ================= UPGRADE ================= */
 
 .upgrade-card {
     display: flex;
 
     align-items: center;
 
-    gap: 9px;
+    gap: 8px;
 
-    padding: 9px;
+    padding: 8px;
 
-    margin-top: 7px;
+    margin-top: 6px;
 
-    border-radius: 14px;
+    border-radius: 13px;
 
     background:
         rgba(255,255,255,0.055);
-
-    border:
-        1px solid
-        rgba(255,255,255,0.06);
 }
 
 
 .upgrade-icon {
-    width: 38px;
-    height: 38px;
+    width: 35px;
+    height: 35px;
 
     display: flex;
 
@@ -395,12 +497,12 @@ button {
 
     flex-shrink: 0;
 
-    border-radius: 11px;
+    border-radius: 10px;
 
     background:
         rgba(255,255,255,0.08);
 
-    font-size: 21px;
+    font-size: 19px;
 }
 
 
@@ -416,31 +518,27 @@ button {
 .upgrade-top {
     display: flex;
 
-    align-items: center;
-
     justify-content: space-between;
 
-    gap: 5px;
-
-    font-size: 11px;
+    font-size: 10px;
 }
 
 
 .upgrade-top span {
     color: #ffd54f;
 
-    font-size: 10px;
+    font-size: 9px;
 }
 
 
 .progress {
-    height: 6px;
+    height: 5px;
 
-    margin: 5px 0;
-
-    border-radius: 10px;
+    margin: 4px 0;
 
     overflow: hidden;
+
+    border-radius: 10px;
 
     background:
         rgba(255,255,255,0.1);
@@ -468,20 +566,20 @@ button {
 
 
 .upgrade-info small {
-    font-size: 8px;
+    font-size: 7px;
 
-    opacity: 0.55;
+    opacity: 0.5;
 }
 
 
 .upgrade-btn {
-    min-width: 72px;
+    min-width: 68px;
 
-    padding: 9px 7px;
+    padding: 8px 5px;
 
     border: none;
 
-    border-radius: 10px;
+    border-radius: 9px;
 
     background:
         linear-gradient(
@@ -492,25 +590,11 @@ button {
 
     color: #222;
 
-    font-size: 10px;
+    font-size: 9px;
 
     font-weight: 900;
 
     cursor: pointer;
-
-    box-shadow:
-        0 4px 10px
-        rgba(0,0,0,0.2);
-}
-
-
-.upgrade-btn:hover {
-    transform: translateY(-2px);
-}
-
-
-.upgrade-btn:active {
-    transform: scale(0.95);
 }
 
 
@@ -525,6 +609,289 @@ button {
     color: white;
 
     cursor: default;
+}
+
+
+/* ================= PANELS ================= */
+
+.panel {
+    margin-top: 12px;
+
+    padding: 12px;
+
+    border-radius: 19px;
+
+    background:
+        rgba(0,0,0,0.2);
+
+    border:
+        1px solid
+        rgba(255,255,255,0.08);
+}
+
+
+.panel-header {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    margin-bottom: 9px;
+}
+
+
+.panel-header .section-title {
+    text-align: left;
+
+    color: #ffd54f;
+}
+
+
+.panel-header small {
+    display: block;
+
+    margin-top: 2px;
+
+    text-align: left;
+
+    font-size: 8px;
+
+    opacity: 0.5;
+}
+
+
+.panel-count {
+    padding: 5px 9px;
+
+    border-radius: 8px;
+
+    background:
+        rgba(255,213,79,0.12);
+
+    color: #ffd54f;
+
+    font-size: 10px;
+
+    font-weight: 900;
+}
+
+
+/* ================= MISSIONS ================= */
+
+.mission-card {
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    padding: 8px;
+
+    margin-top: 6px;
+
+    border-radius: 12px;
+
+    background:
+        rgba(255,255,255,0.045);
+}
+
+
+.mission-icon {
+    width: 35px;
+    height: 35px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    border-radius: 9px;
+
+    background:
+        rgba(255,255,255,0.07);
+
+    font-size: 18px;
+}
+
+
+.mission-info {
+    flex: 1;
+
+    min-width: 0;
+
+    text-align: left;
+}
+
+
+.mission-info strong {
+    display: block;
+
+    font-size: 10px;
+}
+
+
+.mission-info small {
+    display: block;
+
+    margin-top: 2px;
+
+    font-size: 8px;
+
+    opacity: 0.5;
+}
+
+
+.mission-progress {
+    height: 5px;
+
+    margin-top: 5px;
+
+    overflow: hidden;
+
+    border-radius: 10px;
+
+    background:
+        rgba(255,255,255,0.1);
+}
+
+
+.mission-progress span {
+    display: block;
+
+    width: 0%;
+
+    height: 100%;
+
+    border-radius: 10px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #00c853,
+            #69f0ae
+        );
+
+    transition: width 0.3s;
+}
+
+
+.mission-numbers {
+    display: flex;
+
+    justify-content: space-between;
+
+    margin-top: 3px;
+
+    font-size: 7px;
+
+    opacity: 0.55;
+}
+
+
+.mission-numbers b {
+    color: #ffd54f;
+
+    opacity: 1;
+}
+
+
+.mission-status {
+    min-width: 32px;
+
+    text-align: right;
+
+    color: #ffd54f;
+
+    font-size: 8px;
+
+    font-weight: 900;
+}
+
+
+.mission-card.completed {
+    background:
+        rgba(0,200,83,0.1);
+
+    border:
+        1px solid
+        rgba(105,240,174,0.12);
+}
+
+
+/* ================= ACHIEVEMENTS ================= */
+
+.achievement-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 6px;
+}
+
+
+.achievement-card {
+    padding: 10px 5px;
+
+    min-height: 78px;
+
+    border-radius: 12px;
+
+    background:
+        rgba(255,255,255,0.045);
+
+    border:
+        1px solid
+        rgba(255,255,255,0.06);
+
+    opacity: 0.38;
+
+    text-align: center;
+
+    transition: 0.3s;
+}
+
+
+.achievement-card > div {
+    font-size: 22px;
+
+    margin-bottom: 3px;
+}
+
+
+.achievement-card strong {
+    display: block;
+
+    font-size: 9px;
+}
+
+
+.achievement-card small {
+    display: block;
+
+    margin-top: 3px;
+
+    font-size: 7px;
+
+    opacity: 0.6;
+}
+
+
+.achievement-card.unlocked {
+    opacity: 1;
+
+    border-color:
+        rgba(255,213,79,0.35);
+
+    background:
+        rgba(255,213,79,0.1);
+
+    box-shadow:
+        0 0 12px
+        rgba(255,213,79,0.12);
 }
 
 
@@ -550,7 +917,7 @@ button {
 
     color: white;
 
-    font-size: 19px;
+    font-size: 18px;
 
     font-weight: 900;
 
@@ -561,17 +928,6 @@ button {
     box-shadow:
         0 8px 20px
         rgba(0,0,0,0.25);
-
-    transition: 0.2s;
-}
-
-
-#startBtn:hover {
-    transform: translateY(-2px);
-
-    box-shadow:
-        0 12px 25px
-        rgba(0,0,0,0.3);
 }
 
 
@@ -581,13 +937,13 @@ button {
 
 
 .instruction {
-    margin-top: 11px;
+    margin-top: 10px;
 
-    line-height: 1.5;
+    line-height: 1.45;
 
-    font-size: 10px;
+    font-size: 9px;
 
-    opacity: 0.58;
+    opacity: 0.55;
 }
 
 
@@ -596,15 +952,15 @@ button {
 #hud {
     position: fixed;
 
-    top: 15px;
-    left: 15px;
-    right: 15px;
+    top: 14px;
+    left: 14px;
+    right: 14px;
 
     display: none;
 
     align-items: center;
 
-    gap: 8px;
+    gap: 7px;
 
     z-index: 20;
 
@@ -613,11 +969,11 @@ button {
 
 
 .hud-item {
-    min-width: 85px;
+    min-width: 78px;
 
-    padding: 9px 11px;
+    padding: 9px 9px;
 
-    border-radius: 12px;
+    border-radius: 11px;
 
     text-align: center;
 
@@ -628,31 +984,26 @@ button {
 
     color: white;
 
-    font-size: 13px;
+    font-size: 12px;
 
     font-weight: bold;
 }
 
 
-.hud-item.lives {
-    min-width: 65px;
-}
-
-
 .hud-button {
-    width: 42px;
-    height: 42px;
+    width: 41px;
+    height: 41px;
 
     border: none;
 
-    border-radius: 11px;
+    border-radius: 10px;
 
     background:
         rgba(0,0,0,0.55);
 
     color: white;
 
-    font-size: 19px;
+    font-size: 18px;
 
     cursor: pointer;
 
@@ -723,10 +1074,6 @@ button {
         rgba(25,25,30,0.96);
 
     color: white;
-
-    box-shadow:
-        0 20px 50px
-        rgba(0,0,0,0.4);
 }
 
 
@@ -757,9 +1104,9 @@ button {
 
     color: white;
 
-    font-weight: 900;
+    font-size: 15px;
 
-    font-size: 16px;
+    font-weight: 900;
 
     cursor: pointer;
 }
@@ -785,7 +1132,7 @@ button {
 }
 
 
-/* ================= MOBILE ================= */
+/* ================= CONTROLS ================= */
 
 #controls {
     position: fixed;
@@ -793,9 +1140,9 @@ button {
     left: 0;
     right: 0;
 
-    bottom: 20px;
+    bottom: 18px;
 
-    padding: 0 20px;
+    padding: 0 18px;
 
     display: none;
 
@@ -808,8 +1155,8 @@ button {
 
 
 .control {
-    width: 145px;
-    height: 65px;
+    width: 140px;
+    height: 63px;
 
     border: none;
 
@@ -817,7 +1164,7 @@ button {
 
     color: white;
 
-    font-size: 18px;
+    font-size: 17px;
 
     font-weight: 900;
 
@@ -832,11 +1179,6 @@ button {
     box-shadow:
         0 8px 20px
         rgba(0,0,0,0.3);
-}
-
-
-.control:active {
-    transform: scale(0.94);
 }
 
 
@@ -860,111 +1202,74 @@ button {
 }
 
 
-/* ================= RESPONSIVE ================= */
+/* ================= MOBILE ================= */
 
 @media (max-width: 600px) {
 
     #menu {
-        padding: 8px;
+        padding: 6px;
     }
 
     .menu-card {
-        padding: 22px 13px;
+        padding: 20px 11px;
     }
 
     .game-icon {
-        font-size: 45px;
-    }
-
-    .top-stats {
-        gap: 6px;
+        font-size: 43px;
     }
 
     .stat-box {
-        min-width: 125px;
-        padding: 8px 10px;
-        font-size: 11px;
-    }
-
-    .stat-box strong {
-        font-size: 15px;
-    }
-
-    #vehicleSelection {
-        gap: 5px;
+        min-width: 120px;
     }
 
     .vehicle-card {
-        min-height: 108px;
+        min-height: 104px;
     }
 
     .vehicle-emoji {
-        font-size: 31px;
-    }
-
-    .vehicle-card strong {
-        font-size: 9px;
-    }
-
-    .vehicle-card small {
-        font-size: 8px;
-    }
-
-    .vehicle-status {
-        font-size: 7px;
+        font-size: 29px;
     }
 
     .garage {
-        padding: 10px;
+        padding: 9px;
     }
 
-    .upgrade-card {
-        padding: 7px;
+    .panel {
+        padding: 9px;
     }
 
-    .upgrade-icon {
-        width: 34px;
-        height: 34px;
-        font-size: 18px;
-    }
-
-    .upgrade-btn {
-        min-width: 67px;
-        font-size: 9px;
+    .achievement-card {
+        min-height: 70px;
+        padding: 8px 3px;
     }
 
     .hud-item {
         min-width: auto;
-        padding: 8px 7px;
-        font-size: 11px;
-    }
-
-    .hud-item.lives {
-        min-width: auto;
+        padding: 8px 6px;
+        font-size: 10px;
     }
 
     .hud-button {
-        width: 38px;
-        height: 38px;
-        font-size: 17px;
+        width: 37px;
+        height: 37px;
     }
 
     #hud {
-        gap: 5px;
-        top: 10px;
-        left: 8px;
-        right: 8px;
+        top: 8px;
+        left: 7px;
+        right: 7px;
+        gap: 4px;
     }
 
     #controls {
-        bottom: 14px;
-        padding: 0 12px;
+        bottom: 13px;
+        padding: 0 10px;
     }
 
     .control {
-        width: 125px;
-        height: 58px;
-        font-size: 16px;
+        width: 120px;
+        height: 57px;
+        font-size: 15px;
     }
 }
 
@@ -972,33 +1277,24 @@ button {
 @media (max-width: 380px) {
 
     .menu-card {
-        padding: 18px 10px;
+        padding: 17px 8px;
     }
 
-    .vehicle-card {
-        min-height: 100px;
+    .achievement-card {
+        min-height: 65px;
     }
 
-    .vehicle-emoji {
-        font-size: 27px;
+    .achievement-card > div {
+        font-size: 19px;
     }
 
-    .garage {
-        padding: 8px;
-    }
-
-    .upgrade-card {
-        gap: 5px;
-    }
-
-    .upgrade-btn {
-        min-width: 61px;
-        padding: 8px 4px;
+    .mission-card {
+        padding: 6px;
     }
 
     .hud-item {
         font-size: 9px;
-        padding: 7px 5px;
+        padding: 7px 4px;
     }
 
     .hud-button {
@@ -1007,8 +1303,8 @@ button {
     }
 
     .control {
-        width: 110px;
-        height: 55px;
-        font-size: 14px;
+        width: 108px;
+        height: 53px;
+        font-size: 13px;
     }
 }
