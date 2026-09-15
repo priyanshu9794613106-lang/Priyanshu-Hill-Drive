@@ -3,83 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Priyanshu Hill Drive</title>
+
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<!-- ================= MAIN MENU ================= -->
+    <!-- MENU -->
+    <div id="menu">
 
-<div id="menu">
+        <div class="menu-card">
 
-    <div class="menu-card">
+            <div class="game-icon">🚗</div>
 
-        <div class="game-icon">🚗</div>
+            <h1>PRIYANSHU</h1>
+            <h2>HILL DRIVE</h2>
 
-        <h1>PRIYANSHU</h1>
-        <h2>HILL DRIVE</h2>
+            <p class="developer">
+                Developed by <strong>Priyanshu Mishra</strong>
+            </p>
 
-        <p class="developer">
-            Developed by <strong>Priyanshu Mishra</strong>
-        </p>
+            <div class="top-stats">
 
+                <div class="stat-box">
+                    🏆 BEST
+                    <strong>
+                        <span id="menuBestScore">0</span> m
+                    </strong>
+                </div>
 
-        <!-- TOP STATS -->
+                <div class="stat-box">
+                    🪙 COINS
+                    <strong id="menuCoins">0</strong>
+                </div>
 
-        <div class="top-stats">
+                <div class="stat-box">
+                    🗺️ LEVEL
+                    <strong id="menuLevel">1</strong>
+                </div>
 
-            <div class="stat-box">
-                🏆 Best
-                <strong>
-                    <span id="menuBestScore">0</span> m
-                </strong>
             </div>
 
-            <div class="stat-box">
-                🪙 Coins
-                <strong id="menuCoins">0</strong>
-            </div>
 
-        </div>
-
-
-        <!-- NAVIGATION -->
-
-        <div class="menu-tabs">
-
-            <button class="menu-tab active" data-panel="garagePanel">
-                🔧 GARAGE
-            </button>
-
-            <button class="menu-tab" data-panel="missionPanel">
-                🎯 MISSIONS
-            </button>
-
-            <button class="menu-tab" data-panel="achievementPanel">
-                🏆 AWARDS
-            </button>
-
-            <button class="menu-tab" data-panel="rewardPanel">
-                🎁 REWARD
-            </button>
-
-        </div>
-
-
-        <!-- ================= GARAGE PANEL ================= -->
-
-        <div id="garagePanel" class="menu-panel active">
-
+            <!-- VEHICLES -->
             <div class="section-title">
                 🚘 SELECT VEHICLE
             </div>
 
-
             <div id="vehicleSelection">
 
                 <button class="vehicle-card selected"
-                        data-vehicle="car">
+                    data-vehicle="car">
 
                     <div class="vehicle-emoji">🚗</div>
 
@@ -95,7 +71,7 @@
 
 
                 <button class="vehicle-card locked"
-                        data-vehicle="suv">
+                    data-vehicle="suv">
 
                     <div class="vehicle-emoji">🚙</div>
 
@@ -111,7 +87,7 @@
 
 
                 <button class="vehicle-card locked"
-                        data-vehicle="bike">
+                    data-vehicle="bike">
 
                     <div class="vehicle-emoji">🏍️</div>
 
@@ -129,13 +105,11 @@
 
 
             <!-- GARAGE -->
-
             <div class="garage">
 
                 <div class="garage-header">
 
                     <div>
-
                         <div class="section-title garage-title">
                             🔧 GARAGE
                         </div>
@@ -143,7 +117,6 @@
                         <div class="garage-subtitle">
                             Upgrade your vehicle
                         </div>
-
                     </div>
 
                     <div class="garage-level">
@@ -152,8 +125,6 @@
 
                 </div>
 
-
-                <!-- ENGINE -->
 
                 <div class="upgrade-card">
 
@@ -176,7 +147,7 @@
                         </div>
 
                         <small>
-                            More acceleration & power
+                            More acceleration
                         </small>
 
                     </div>
@@ -189,8 +160,6 @@
 
                 </div>
 
-
-                <!-- TIRES -->
 
                 <div class="upgrade-card">
 
@@ -213,7 +182,7 @@
                         </div>
 
                         <small>
-                            Better grip & stability
+                            Better stability
                         </small>
 
                     </div>
@@ -226,8 +195,6 @@
 
                 </div>
 
-
-                <!-- FUEL -->
 
                 <div class="upgrade-card">
 
@@ -264,8 +231,6 @@
                 </div>
 
 
-                <!-- SPEED -->
-
                 <div class="upgrade-card">
 
                     <div class="upgrade-icon">⚡</div>
@@ -287,7 +252,7 @@
                         </div>
 
                         <small>
-                            Higher maximum speed
+                            Higher top speed
                         </small>
 
                     </div>
@@ -302,503 +267,169 @@
 
             </div>
 
-        </div>
 
+            <!-- LEVEL INFO -->
+            <div class="level-box">
 
-        <!-- ================= MISSIONS ================= -->
-
-        <div id="missionPanel" class="menu-panel">
-
-            <div class="panel-heading">
-                🎯 DAILY MISSIONS
-            </div>
-
-            <p class="panel-subtitle">
-                Complete missions and earn bonus coins
-            </p>
-
-
-            <div class="mission-card">
-
-                <div class="mission-icon">
-                    📏
-                </div>
-
-                <div class="mission-info">
-
-                    <strong>
-                        HILL RUNNER
+                <div>
+                    🗺️ CURRENT LEVEL
+                    <strong id="levelText">
+                        LEVEL 1
                     </strong>
-
-                    <small>
-                        Drive 500 meters
-                    </small>
-
-                    <div class="mission-progress">
-                        <span id="missionDistanceBar"></span>
-                    </div>
-
-                    <div class="mission-count">
-                        <span id="missionDistanceText">
-                            0 / 500 m
-                        </span>
-                    </div>
-
-                </div>
-
-                <div class="mission-reward">
-                    +25 🪙
-                </div>
-
-            </div>
-
-
-            <div class="mission-card">
-
-                <div class="mission-icon">
-                    🪙
-                </div>
-
-                <div class="mission-info">
-
-                    <strong>
-                        COIN HUNTER
-                    </strong>
-
-                    <small>
-                        Collect 10 coins
-                    </small>
-
-                    <div class="mission-progress">
-                        <span id="missionCoinsBar"></span>
-                    </div>
-
-                    <div class="mission-count">
-                        <span id="missionCoinsText">
-                            0 / 10
-                        </span>
-                    </div>
-
-                </div>
-
-                <div class="mission-reward">
-                    +30 🪙
-                </div>
-
-            </div>
-
-
-            <div class="mission-card">
-
-                <div class="mission-icon">
-                    ⛽
-                </div>
-
-                <div class="mission-info">
-
-                    <strong>
-                        FUEL SAVER
-                    </strong>
-
-                    <small>
-                        Collect 2 fuel cans
-                    </small>
-
-                    <div class="mission-progress">
-                        <span id="missionFuelBar"></span>
-                    </div>
-
-                    <div class="mission-count">
-                        <span id="missionFuelText">
-                            0 / 2
-                        </span>
-                    </div>
-
-                </div>
-
-                <div class="mission-reward">
-                    +25 🪙
-                </div>
-
-            </div>
-
-
-            <div class="mission-card">
-
-                <div class="mission-icon">
-                    🏁
-                </div>
-
-                <div class="mission-info">
-
-                    <strong>
-                        SURVIVOR
-                    </strong>
-
-                    <small>
-                        Complete a 1000m run
-                    </small>
-
-                    <div class="mission-progress">
-                        <span id="missionSurvivorBar"></span>
-                    </div>
-
-                    <div class="mission-count">
-                        <span id="missionSurvivorText">
-                            0 / 1000 m
-                        </span>
-                    </div>
-
-                </div>
-
-                <div class="mission-reward">
-                    +50 🪙
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- ================= ACHIEVEMENTS ================= -->
-
-        <div id="achievementPanel" class="menu-panel">
-
-            <div class="panel-heading">
-                🏆 ACHIEVEMENTS
-            </div>
-
-            <p class="panel-subtitle">
-                Unlock achievements and earn bonus coins
-            </p>
-
-
-            <div class="achievement-card">
-
-                <div class="achievement-icon">
-                    🚀
                 </div>
 
                 <div>
-                    <strong>
-                        FIRST DRIVE
+                    🏁 CHECKPOINT
+                    <strong id="menuCheckpoint">
+                        0 / 3
                     </strong>
-
-                    <small>
-                        Play your first run
-                    </small>
-                </div>
-
-                <span
-                    id="achievementFirstDrive"
-                    class="achievement-status">
-                    🔒
-                </span>
-
-            </div>
-
-
-            <div class="achievement-card">
-
-                <div class="achievement-icon">
-                    🏔️
-                </div>
-
-                <div>
-                    <strong>
-                        MOUNTAIN MASTER
-                    </strong>
-
-                    <small>
-                        Reach 1000 meters
-                    </small>
-                </div>
-
-                <span
-                    id="achievement1000"
-                    class="achievement-status">
-                    🔒
-                </span>
-
-            </div>
-
-
-            <div class="achievement-card">
-
-                <div class="achievement-icon">
-                    💰
-                </div>
-
-                <div>
-                    <strong>
-                        COIN COLLECTOR
-                    </strong>
-
-                    <small>
-                        Collect 100 total coins
-                    </small>
-                </div>
-
-                <span
-                    id="achievement100Coins"
-                    class="achievement-status">
-                    🔒
-                </span>
-
-            </div>
-
-
-            <div class="achievement-card">
-
-                <div class="achievement-icon">
-                    🚙
-                </div>
-
-                <div>
-                    <strong>
-                        GARAGE OWNER
-                    </strong>
-
-                    <small>
-                        Unlock another vehicle
-                    </small>
-                </div>
-
-                <span
-                    id="achievementVehicle"
-                    class="achievement-status">
-                    🔒
-                </span>
-
-            </div>
-
-
-            <div class="achievement-card">
-
-                <div class="achievement-icon">
-                    ⚡
-                </div>
-
-                <div>
-                    <strong>
-                        MAX POWER
-                    </strong>
-
-                    <small>
-                        Upgrade any part to Level 5
-                    </small>
-                </div>
-
-                <span
-                    id="achievementUpgrade"
-                    class="achievement-status">
-                    🔒
-                </span>
-
-            </div>
-
-        </div>
-
-
-        <!-- ================= DAILY REWARD ================= -->
-
-        <div id="rewardPanel" class="menu-panel">
-
-            <div class="panel-heading">
-                🎁 DAILY REWARD
-            </div>
-
-            <p class="panel-subtitle">
-                Come back every day for free coins
-            </p>
-
-
-            <div class="reward-streak">
-
-                <div class="streak-title">
-                    🔥 DAILY STREAK
-                </div>
-
-                <strong>
-                    Day <span id="rewardDay">1</span> / 7
-                </strong>
-
-            </div>
-
-
-            <div class="reward-days">
-
-                <div class="reward-day" id="reward1">
-                    <span>DAY 1</span>
-                    <b>25 🪙</b>
-                </div>
-
-                <div class="reward-day" id="reward2">
-                    <span>DAY 2</span>
-                    <b>35 🪙</b>
-                </div>
-
-                <div class="reward-day" id="reward3">
-                    <span>DAY 3</span>
-                    <b>50 🪙</b>
-                </div>
-
-                <div class="reward-day" id="reward4">
-                    <span>DAY 4</span>
-                    <b>65 🪙</b>
-                </div>
-
-                <div class="reward-day" id="reward5">
-                    <span>DAY 5</span>
-                    <b>80 🪙</b>
-                </div>
-
-                <div class="reward-day" id="reward6">
-                    <span>DAY 6</span>
-                    <b>100 🪙</b>
-                </div>
-
-                <div class="reward-day" id="reward7">
-                    <span>DAY 7</span>
-                    <b>150 🪙</b>
                 </div>
 
             </div>
 
 
-            <button id="claimRewardBtn">
-                🎁 CLAIM DAILY REWARD
+            <button id="startBtn">
+                ▶ START GAME
             </button>
 
-            <p id="rewardMessage" class="reward-message">
-                Your daily reward is waiting!
+
+            <p class="instruction">
+
+                ⌨️ Arrow Right / D = GAS
+                <br>
+
+                ⬅️ Arrow Left / A = BRAKE
+                <br>
+
+                📱 Mobile controls supported
+                <br>
+
+                ⏸️ P / ESC = PAUSE
+
             </p>
 
         </div>
 
-
-        <!-- START GAME -->
-
-        <button id="startBtn">
-            ▶ START GAME
-        </button>
-
-
-        <p class="instruction">
-            ⌨️ Arrow Right / D = GAS
-            <br>
-            ⬅️ Arrow Left / A = BRAKE
-            <br>
-            📱 Mobile controls supported
-            <br>
-            ⏸️ P / ESC = PAUSE
-        </p>
-
     </div>
 
-</div>
+
+    <!-- GAME CANVAS -->
+    <canvas id="gameCanvas"></canvas>
 
 
-<!-- ================= GAME ================= -->
-
-<canvas id="gameCanvas"></canvas>
-
-
-<!-- COUNTDOWN -->
-
-<div id="countdown">
-    3
-</div>
-
-
-<!-- ================= HUD ================= -->
-
-<div id="hud">
-
-    <div class="hud-item">
-        📏
-        <span id="distance">0</span> m
+    <!-- COUNTDOWN -->
+    <div id="countdown">
+        3
     </div>
 
-    <div class="hud-item">
-        🪙
-        <span id="coins">0</span>
-    </div>
 
-    <div class="hud-item">
-        ⛽
-        <span id="fuel">100</span>%
-    </div>
+    <!-- LEVEL COMPLETE -->
+    <div id="levelComplete">
 
-    <div class="hud-item lives">
-        ❤️
-        <span id="lives">3</span>
-    </div>
+        <div class="level-card">
 
-    <button id="pauseBtn" class="hud-button">
-        ⏸️
-    </button>
+            <div class="level-icon">
+                🏁
+            </div>
 
-    <button id="soundBtn" class="hud-button">
-        🔊
-    </button>
+            <h2>CHECKPOINT!</h2>
 
-</div>
+            <p id="checkpointMessage">
+                Checkpoint reached
+            </p>
 
+            <div class="reward">
+                🪙 +25 COINS
+            </div>
 
-<!-- ================= PAUSE ================= -->
+            <button id="continueBtn">
+                ▶ CONTINUE
+            </button>
 
-<div id="pauseScreen">
-
-    <div class="pause-card">
-
-        <div class="pause-icon">
-            ⏸️
         </div>
 
-        <h2>GAME PAUSED</h2>
+    </div>
 
-        <button id="resumeBtn">
-            ▶ RESUME
+
+    <!-- HUD -->
+    <div id="hud">
+
+        <div class="hud-item">
+            📏 <span id="distance">0</span> m
+        </div>
+
+        <div class="hud-item">
+            🪙 <span id="coins">0</span>
+        </div>
+
+        <div class="hud-item">
+            ⛽ <span id="fuel">100</span>%
+        </div>
+
+        <div class="hud-item">
+            ❤️ <span id="lives">3</span>
+        </div>
+
+        <div class="hud-item level-hud">
+            🗺️ LV <span id="currentLevel">1</span>
+        </div>
+
+        <div class="hud-item checkpoint-hud">
+            🏁 <span id="checkpoint">0</span>/3
+        </div>
+
+        <button id="pauseBtn" class="hud-button">
+            ⏸️
         </button>
 
-        <button id="quitBtn">
-            🏠 MAIN MENU
+        <button id="soundBtn" class="hud-button">
+            🔊
         </button>
 
     </div>
 
-</div>
+
+    <!-- PAUSE -->
+    <div id="pauseScreen">
+
+        <div class="pause-card">
+
+            <div class="pause-icon">
+                ⏸️
+            </div>
+
+            <h2>GAME PAUSED</h2>
+
+            <button id="resumeBtn">
+                ▶ RESUME
+            </button>
+
+            <button id="quitBtn">
+                🏠 MAIN MENU
+            </button>
+
+        </div>
+
+    </div>
 
 
-<!-- ================= MOBILE CONTROLS ================= -->
+    <!-- MOBILE CONTROLS -->
+    <div id="controls">
 
-<div id="controls">
-
-    <button id="brakeBtn"
+        <button id="brakeBtn"
             class="control brake">
-        ◀ BRAKE
-    </button>
+            ◀ BRAKE
+        </button>
 
-    <button id="gasBtn"
+        <button id="gasBtn"
             class="control gas">
-        GAS ▶
-    </button>
+            GAS ▶
+        </button>
 
-</div>
-
-
-<!-- TOAST -->
-
-<div id="toast">
-    <span id="toastIcon">🏆</span>
-    <div id="toastText">
-        Achievement unlocked!
     </div>
-</div>
 
 
-<script src="script.js"></script>
+    <script src="script.js"></script>
 
 </body>
 </html>
