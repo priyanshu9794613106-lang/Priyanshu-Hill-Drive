@@ -1,20 +1,10 @@
 /* =====================================================
    PRIYANSHU HILL DRIVE
-   Step 1 - Complete Game System
+   STEP 2 — REALISTIC HILL PHYSICS
 ===================================================== */
-
-
-/* =========================
-   CANVAS
-========================= */
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
-
-
-/* =========================
-   UI
-========================= */
 
 const menu = document.getElementById("menu");
 const startBtn = document.getElementById("startBtn");
@@ -29,56 +19,89 @@ const fuelText = document.getElementById("fuel");
 const menuBestScore =
   document.getElementById("menuBestScore");
 
-const gasBtn =
-  document.getElementById("gasBtn");
-
-const brakeBtn =
-  document.getElementById("brakeBtn");
+const gasBtn = document.getElementById("gasBtn");
+const brakeBtn = document.getElementById("brakeBtn");
 
 
-/* =========================
-   GAME VARIABLES
-========================= */
+/* =====================================================
+   CANVAS
+===================================================== */
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+
+resizeCanvas();
+
+window.addEventListener("resize", () => {
+  resizeCanvas();
+
+  if (!gameRunning) {
+    createTerrain();
+    drawGame();
+  }
+});
+
+
+/* =====================================================
+   GAME STATE
+===================================================== */
 
 let gameRunning = false;
-
 let animationId = null;
 
 let distance = 0;
-
 let coins = 0;
-
 let fuel = 100;
 
 let speed = 0;
-
 let carX = 180;
 
 let cameraX = 0;
 
-let gasPressed = false;
+let carVelocityY = 0;
+let carY = 0;
 
+let carAngle = 0;
+let wheelRotation = 0;
+
+let gasPressed = false;
 let brakePressed = false;
 
 
-/* =========================
-   SETTINGS
-========================= */
+/* =====================================================
+   GAME SETTINGS
+===================================================== */
 
-const MAX_SPEED = 9;
+const WORLD_WIDTH = 8000;
+const TERRAIN_STEP = 20;
 
-const ACCELERATION = 0.14;
+const MAX_SPEED = 10;
 
-const BRAKE_POWER = 0.22;
+const ENGINE_POWER = 0.16;
+
+const BRAKE_POWER = 0.25;
 
 const FRICTION = 0.035;
 
-const GRAVITY = 0.45;
+const GRAVITY = 0.5;
+
+const BOUNCE_POWER = -3.5;
 
 
-/* =========================
+/* =====================================================
+   TERRAIN
+===================================================== */
+
+let terrain = [];
+let coinItems = [];
+let fuelItems = [];
+
+
+/* =====================================================
    BEST SCORE
-========================= */
+===================================================== */
 
 let bestScore =
   Number(
@@ -90,43 +113,9 @@ let bestScore =
 menuBestScore.textContent = bestScore;
 
 
-/* =========================
-   TERRAIN
-========================= */
-
-let terrain = [];
-
-let coinItems = [];
-
-let fuelItems = [];
-
-const WORLD_WIDTH = 8000;
-
-const TERRAIN_STEP = 20;
-
-
-/* =========================
-   RESIZE
-========================= */
-
-function resizeCanvas() {
-
-  canvas.width = window.innerWidth;
-
-  canvas.height = window.innerHeight;
-}
-
-resizeCanvas();
-
-window.addEventListener(
-  "resize",
-  resizeCanvas
-);
-
-
-/* =========================
-   TERRAIN GENERATION
-========================= */
+/* =====================================================
+   CREATE TERRAIN
+===================================================== */
 
 function createTerrain() {
 
@@ -141,25 +130,25 @@ function createTerrain() {
     const y =
       canvas.height * 0.68 +
 
-      Math.sin(x * 0.006) * 65 +
+      Math.sin(x * 0.006) * 70 +
 
-      Math.sin(x * 0.015) * 28 +
+      Math.sin(x * 0.014) * 30 +
 
-      Math.sin(x * 0.002) * 40 +
+      Math.sin(x * 0.0023) * 45 +
 
-      Math.sin(x * 0.027) * 12;
+      Math.sin(x * 0.029) * 10;
 
     terrain.push({
-      x: x,
-      y: y
+      x,
+      y
     });
   }
 }
 
 
-/* =========================
-   GROUND Y
-========================= */
+/* =====================================================
+   GROUND HEIGHT
+===================================================== */
 
 function getGroundY(worldX) {
 
@@ -172,7 +161,6 @@ function getGroundY(worldX) {
     index < 0 ||
     index >= terrain.length
   ) {
-
     return canvas.height * 0.68;
   }
 
@@ -180,14 +168,34 @@ function getGroundY(worldX) {
 }
 
 
-/* =========================
-   ITEMS
-========================= */
+/* =====================================================
+   GROUND SLOPE
+===================================================== */
+
+function getGroundSlope(worldX) {
+
+  const y1 =
+    getGroundY(worldX - 10);
+
+  const y2 =
+    getGroundY(worldX + 10);
+
+  return (
+    Math.atan2(
+      y2 - y1,
+      20
+    )
+  );
+}
+
+
+/* =====================================================
+   CREATE ITEMS
+===================================================== */
 
 function createItems() {
 
   coinItems = [];
-
   fuelItems = [];
 
 
@@ -195,26 +203,23 @@ function createItems() {
 
   for (
     let i = 0;
-    i < 100;
+    i < 110;
     i++
   ) {
 
     const x =
       350 +
-      i * 70 +
-      Math.random() * 45;
-
-    const ground =
-      getGroundY(x);
+      i * 65 +
+      Math.random() * 40;
 
     coinItems.push({
 
-      x: x,
+      x,
 
       y:
-        ground -
+        getGroundY(x) -
         55 -
-        Math.random() * 20,
+        Math.random() * 25,
 
       collected: false
 
@@ -234,14 +239,13 @@ function createItems() {
       600 +
       i * 350;
 
-    const ground =
-      getGroundY(x);
-
     fuelItems.push({
 
-      x: x,
+      x,
 
-      y: ground - 55,
+      y:
+        getGroundY(x) -
+        55,
 
       collected: false
 
@@ -250,9 +254,9 @@ function createItems() {
 }
 
 
-/* =========================
+/* =====================================================
    RESET GAME
-========================= */
+===================================================== */
 
 function resetGame() {
 
@@ -268,17 +272,27 @@ function resetGame() {
 
   cameraX = 0;
 
+  carVelocityY = 0;
+
+  carAngle = 0;
+
+  wheelRotation = 0;
+
   createTerrain();
 
   createItems();
+
+  carY =
+    getGroundY(carX) -
+    55;
 
   updateHUD();
 }
 
 
-/* =========================
+/* =====================================================
    START GAME
-========================= */
+===================================================== */
 
 function startGame() {
 
@@ -298,9 +312,9 @@ function startGame() {
 }
 
 
-/* =========================
+/* =====================================================
    GAME OVER
-========================= */
+===================================================== */
 
 function gameOver() {
 
@@ -308,12 +322,9 @@ function gameOver() {
 
   cancelAnimationFrame(animationId);
 
-
   const finalDistance =
     Math.floor(distance);
 
-
-  /* UPDATE BEST SCORE */
 
   if (
     finalDistance >
@@ -329,12 +340,6 @@ function gameOver() {
     );
   }
 
-
-  menuBestScore.textContent =
-    bestScore;
-
-
-  /* GAME OVER SCREEN */
 
   menu.innerHTML = `
 
@@ -376,13 +381,12 @@ function gameOver() {
       </button>
 
       <p class="instruction">
-        Keep driving and beat your best score!
+        Try to climb farther!
       </p>
 
     </div>
 
   `;
-
 
   menu.style.display = "flex";
 
@@ -400,9 +404,9 @@ function gameOver() {
 }
 
 
-/* =========================
+/* =====================================================
    HUD
-========================= */
+===================================================== */
 
 function updateHUD() {
 
@@ -417,25 +421,37 @@ function updateHUD() {
 }
 
 
-/* =========================
-   GAME UPDATE
-========================= */
+/* =====================================================
+   PHYSICS UPDATE
+===================================================== */
 
-function updateGame() {
+function updatePhysics() {
 
-  if (!gameRunning) return;
+  const slope =
+    getGroundSlope(carX);
 
 
-  /* GAS */
+  /* ENGINE */
 
   if (gasPressed) {
 
-    speed += ACCELERATION;
+    speed +=
+      ENGINE_POWER *
+      (1 - Math.abs(slope) * 0.5);
 
   } else {
 
     speed -= FRICTION;
   }
+
+
+  /* GRAVITY ON HILLS */
+
+  const gravityForce =
+    Math.sin(slope) *
+    0.18;
+
+  speed -= gravityForce;
 
 
   /* BRAKE */
@@ -461,6 +477,70 @@ function updateGame() {
   /* MOVE */
 
   carX += speed;
+
+
+  /* WHEEL ROTATION */
+
+  wheelRotation +=
+    speed * 0.12;
+
+
+  /* CAR ANGLE */
+
+  const targetAngle =
+    slope;
+
+
+  carAngle +=
+    (
+      targetAngle -
+      carAngle
+    ) * 0.12;
+
+
+  /* VERTICAL PHYSICS */
+
+  const groundY =
+    getGroundY(carX);
+
+
+  const targetY =
+    groundY -
+    50;
+
+
+  const difference =
+    targetY -
+    carY;
+
+
+  carVelocityY +=
+    GRAVITY;
+
+
+  carY +=
+    carVelocityY;
+
+
+  /* GROUND COLLISION */
+
+  if (
+    carY >= targetY
+  ) {
+
+    carY = targetY;
+
+    if (
+      carVelocityY > 1.5
+    ) {
+
+      carVelocityY =
+        BOUNCE_POWER;
+    } else {
+
+      carVelocityY = 0;
+    }
+  }
 
 
   /* CAMERA */
@@ -495,7 +575,7 @@ function updateGame() {
   }
 
 
-  /* COIN COLLECTION */
+  /* COINS */
 
   coinItems.forEach(
     coin => {
@@ -504,7 +584,10 @@ function updateGame() {
         !coin.collected &&
         Math.abs(
           coin.x - carX
-        ) < 35
+        ) < 40 &&
+        Math.abs(
+          coin.y - carY
+        ) < 60
       ) {
 
         coin.collected = true;
@@ -515,7 +598,7 @@ function updateGame() {
   );
 
 
-  /* FUEL COLLECTION */
+  /* FUEL */
 
   fuelItems.forEach(
     item => {
@@ -524,7 +607,10 @@ function updateGame() {
         !item.collected &&
         Math.abs(
           item.x - carX
-        ) < 35
+        ) < 40 &&
+        Math.abs(
+          item.y - carY
+        ) < 60
       ) {
 
         item.collected = true;
@@ -556,9 +642,9 @@ function updateGame() {
 }
 
 
-/* =========================
+/* =====================================================
    SKY
-========================= */
+===================================================== */
 
 function drawSky() {
 
@@ -570,7 +656,6 @@ function drawSky() {
       canvas.height
     );
 
-
   gradient.addColorStop(
     0,
     "#2196F3"
@@ -580,7 +665,6 @@ function drawSky() {
     1,
     "#E1F5FE"
   );
-
 
   ctx.fillStyle =
     gradient;
@@ -594,9 +678,9 @@ function drawSky() {
 }
 
 
-/* =========================
+/* =====================================================
    SUN
-========================= */
+===================================================== */
 
 function drawSun() {
 
@@ -609,7 +693,6 @@ function drawSun() {
 
   ctx.fillStyle =
     "#FFD54F";
-
 
   ctx.beginPath();
 
@@ -627,47 +710,39 @@ function drawSun() {
 }
 
 
-/* =========================
+/* =====================================================
    CLOUDS
-========================= */
+===================================================== */
 
 function drawClouds() {
 
-  const cloudPositions = [
+  const clouds = [
 
-    {
-      x: 120,
-      y: 110,
-      size: 1
-    },
+    [120, 110, 1],
 
-    {
-      x: 430,
-      y: 170,
-      size: 0.8
-    },
+    [430, 160, 0.8],
 
-    {
-      x: 760,
-      y: 100,
-      size: 1.2
-    }
+    [760, 100, 1.2]
 
   ];
 
 
-  cloudPositions.forEach(
+  clouds.forEach(
     cloud => {
 
       const x =
-        cloud.x -
+        cloud[0] -
         cameraX * 0.15;
 
       const y =
-        cloud.y;
+        cloud[1];
+
+      const size =
+        cloud[2];
+
 
       ctx.fillStyle =
-        "rgba(255,255,255,0.8)";
+        "rgba(255,255,255,0.82)";
 
 
       ctx.beginPath();
@@ -675,23 +750,23 @@ function drawClouds() {
       ctx.arc(
         x,
         y,
-        25 * cloud.size,
+        25 * size,
         0,
         Math.PI * 2
       );
 
       ctx.arc(
-        x + 30 * cloud.size,
-        y - 10 * cloud.size,
-        32 * cloud.size,
+        x + 30 * size,
+        y - 10 * size,
+        32 * size,
         0,
         Math.PI * 2
       );
 
       ctx.arc(
-        x + 65 * cloud.size,
+        x + 65 * size,
         y,
-        25 * cloud.size,
+        25 * size,
         0,
         Math.PI * 2
       );
@@ -702,15 +777,14 @@ function drawClouds() {
 }
 
 
-/* =========================
+/* =====================================================
    BACKGROUND MOUNTAINS
-========================= */
+===================================================== */
 
 function drawMountains() {
 
   ctx.fillStyle =
     "#7CB342";
-
 
   ctx.beginPath();
 
@@ -730,14 +804,11 @@ function drawMountains() {
       x +
       cameraX * 0.25;
 
-
     const y =
       canvas.height * 0.52 +
-
       Math.sin(
         worldX * 0.006
       ) * 70;
-
 
     ctx.lineTo(
       x,
@@ -762,17 +833,14 @@ function drawMountains() {
 }
 
 
-/* =========================
+/* =====================================================
    TERRAIN
-========================= */
+===================================================== */
 
 function drawTerrain() {
 
-  /* DIRT */
-
   ctx.fillStyle =
     "#795548";
-
 
   ctx.beginPath();
 
@@ -784,8 +852,9 @@ function drawTerrain() {
         point.x -
         cameraX;
 
-
-      if (index === 0) {
+      if (
+        index === 0
+      ) {
 
         ctx.moveTo(
           x,
@@ -819,14 +888,15 @@ function drawTerrain() {
   ctx.fill();
 
 
-  /* GRASS TOP */
+  /* GRASS */
 
   ctx.strokeStyle =
     "#43A047";
 
   ctx.lineWidth = 8;
 
-  ctx.lineJoin = "round";
+  ctx.lineJoin =
+    "round";
 
 
   ctx.beginPath();
@@ -839,8 +909,9 @@ function drawTerrain() {
         point.x -
         cameraX;
 
-
-      if (index === 0) {
+      if (
+        index === 0
+      ) {
 
         ctx.moveTo(
           x,
@@ -862,9 +933,9 @@ function drawTerrain() {
 }
 
 
-/* =========================
+/* =====================================================
    COINS
-========================= */
+===================================================== */
 
 function drawCoins() {
 
@@ -890,12 +961,10 @@ function drawCoins() {
 
       ctx.save();
 
-
-      ctx.shadowBlur = 10;
+      ctx.shadowBlur = 12;
 
       ctx.shadowColor =
         "#FFD700";
-
 
       ctx.fillStyle =
         "#FFD700";
@@ -944,9 +1013,9 @@ function drawCoins() {
 }
 
 
-/* =========================
+/* =====================================================
    FUEL
-========================= */
+===================================================== */
 
 function drawFuel() {
 
@@ -972,14 +1041,11 @@ function drawFuel() {
 
       ctx.save();
 
-
       ctx.shadowBlur = 10;
 
       ctx.shadowColor =
         "#ff5252";
 
-
-      /* CAN */
 
       ctx.fillStyle =
         "#E53935";
@@ -993,8 +1059,6 @@ function drawFuel() {
       );
 
 
-      /* CAP */
-
       ctx.fillRect(
         x - 7,
         item.y - 24,
@@ -1002,8 +1066,6 @@ function drawFuel() {
         6
       );
 
-
-      /* F */
 
       ctx.fillStyle =
         "#FFFFFF";
@@ -1027,30 +1089,36 @@ function drawFuel() {
 }
 
 
-/* =========================
+/* =====================================================
    CAR
-========================= */
+===================================================== */
 
 function drawCar() {
-
-  const groundY =
-    getGroundY(carX);
-
 
   const x =
     carX -
     cameraX;
 
-
   const y =
-    groundY -
-    50;
+    carY;
 
 
   ctx.save();
 
 
-  /* CAR BODY */
+  /* ROTATE CAR WITH HILL */
+
+  ctx.translate(
+    x,
+    y
+  );
+
+  ctx.rotate(
+    carAngle
+  );
+
+
+  /* BODY */
 
   ctx.fillStyle =
     "#E53935";
@@ -1059,8 +1127,8 @@ function drawCar() {
   ctx.beginPath();
 
   ctx.roundRect(
-    x - 38,
-    y - 28,
+    -38,
+    -28,
     76,
     28,
     8
@@ -1069,7 +1137,20 @@ function drawCar() {
   ctx.fill();
 
 
-  /* CAR ROOF */
+  /* DARK LOWER BODY */
+
+  ctx.fillStyle =
+    "#B71C1C";
+
+  ctx.fillRect(
+    -37,
+    -8,
+    74,
+    8
+  );
+
+
+  /* ROOF */
 
   ctx.fillStyle =
     "#C62828";
@@ -1078,23 +1159,23 @@ function drawCar() {
   ctx.beginPath();
 
   ctx.moveTo(
-    x - 25,
-    y - 28
+    -25,
+    -28
   );
 
   ctx.lineTo(
-    x - 10,
-    y - 48
+    -10,
+    -48
   );
 
   ctx.lineTo(
-    x + 20,
-    y - 48
+    20,
+    -48
   );
 
   ctx.lineTo(
-    x + 33,
-    y - 28
+    33,
+    -28
   );
 
   ctx.closePath();
@@ -1111,23 +1192,23 @@ function drawCar() {
   ctx.beginPath();
 
   ctx.moveTo(
-    x - 8,
-    y - 43
+    -8,
+    -43
   );
 
   ctx.lineTo(
-    x + 2,
-    y - 43
+    2,
+    -43
   );
 
   ctx.lineTo(
-    x + 2,
-    y - 30
+    2,
+    -30
   );
 
   ctx.lineTo(
-    x - 14,
-    y - 30
+    -14,
+    -30
   );
 
   ctx.closePath();
@@ -1138,23 +1219,23 @@ function drawCar() {
   ctx.beginPath();
 
   ctx.moveTo(
-    x + 6,
-    y - 43
+    6,
+    -43
   );
 
   ctx.lineTo(
-    x + 18,
-    y - 43
+    18,
+    -43
   );
 
   ctx.lineTo(
-    x + 27,
-    y - 30
+    27,
+    -30
   );
 
   ctx.lineTo(
-    x + 6,
-    y - 30
+    6,
+    -30
   );
 
   ctx.closePath();
@@ -1162,29 +1243,15 @@ function drawCar() {
   ctx.fill();
 
 
-  /* WHEELS */
-
-  drawWheel(
-    x - 24,
-    y
-  );
-
-  drawWheel(
-    x + 24,
-    y
-  );
-
-
   /* HEADLIGHT */
 
   ctx.fillStyle =
     "#FFF59D";
 
-
   ctx.fillRect(
-    x + 34,
-    y - 18,
-    6,
+    34,
+    -18,
+    7,
     8
   );
 
@@ -1192,14 +1259,26 @@ function drawCar() {
   /* TAIL LIGHT */
 
   ctx.fillStyle =
-    "#7f0000";
-
+    "#7F0000";
 
   ctx.fillRect(
-    x - 40,
-    y - 18,
-    5,
+    -41,
+    -18,
+    6,
     8
+  );
+
+
+  /* WHEELS */
+
+  drawWheel(
+    -24,
+    0
+  );
+
+  drawWheel(
+    24,
+    0
   );
 
 
@@ -1207,14 +1286,29 @@ function drawCar() {
 }
 
 
-/* =========================
+/* =====================================================
    WHEEL
-========================= */
+===================================================== */
 
 function drawWheel(
   x,
   y
 ) {
+
+  ctx.save();
+
+  ctx.translate(
+    x,
+    y
+  );
+
+
+  ctx.rotate(
+    wheelRotation
+  );
+
+
+  /* TYRE */
 
   ctx.fillStyle =
     "#171717";
@@ -1223,8 +1317,8 @@ function drawWheel(
   ctx.beginPath();
 
   ctx.arc(
-    x,
-    y,
+    0,
+    0,
     14,
     0,
     Math.PI * 2
@@ -1233,6 +1327,8 @@ function drawWheel(
   ctx.fill();
 
 
+  /* RIM */
+
   ctx.fillStyle =
     "#BDBDBD";
 
@@ -1240,20 +1336,61 @@ function drawWheel(
   ctx.beginPath();
 
   ctx.arc(
-    x,
-    y,
+    0,
+    0,
     6,
     0,
     Math.PI * 2
   );
 
   ctx.fill();
+
+
+  /* SPOKE */
+
+  ctx.strokeStyle =
+    "#757575";
+
+  ctx.lineWidth = 2;
+
+
+  ctx.beginPath();
+
+  ctx.moveTo(
+    -6,
+    0
+  );
+
+  ctx.lineTo(
+    6,
+    0
+  );
+
+  ctx.stroke();
+
+
+  ctx.beginPath();
+
+  ctx.moveTo(
+    0,
+    -6
+  );
+
+  ctx.lineTo(
+    0,
+    6
+  );
+
+  ctx.stroke();
+
+
+  ctx.restore();
 }
 
 
-/* =========================
+/* =====================================================
    DRAW GAME
-========================= */
+===================================================== */
 
 function drawGame() {
 
@@ -1275,19 +1412,17 @@ function drawGame() {
 }
 
 
-/* =========================
+/* =====================================================
    GAME LOOP
-========================= */
+===================================================== */
 
 function gameLoop() {
 
   if (!gameRunning) return;
 
-
-  updateGame();
+  updatePhysics();
 
   drawGame();
-
 
   animationId =
     requestAnimationFrame(
@@ -1296,9 +1431,9 @@ function gameLoop() {
 }
 
 
-/* =========================
-   KEYBOARD
-========================= */
+/* =====================================================
+   KEYBOARD CONTROLS
+===================================================== */
 
 window.addEventListener(
   "keydown",
@@ -1360,9 +1495,9 @@ window.addEventListener(
 );
 
 
-/* =========================
+/* =====================================================
    MOBILE GAS
-========================= */
+===================================================== */
 
 function pressGas(event) {
 
@@ -1401,9 +1536,9 @@ gasBtn.addEventListener(
 );
 
 
-/* =========================
+/* =====================================================
    MOBILE BRAKE
-========================= */
+===================================================== */
 
 function pressBrake(event) {
 
@@ -1442,9 +1577,9 @@ brakeBtn.addEventListener(
 );
 
 
-/* =========================
+/* =====================================================
    START BUTTON
-========================= */
+===================================================== */
 
 startBtn.addEventListener(
   "click",
@@ -1452,12 +1587,18 @@ startBtn.addEventListener(
 );
 
 
-/* =========================
+/* =====================================================
    INITIALIZE
-========================= */
+===================================================== */
 
 createTerrain();
 
 createItems();
 
+carY =
+  getGroundY(carX) -
+  50;
+
 updateHUD();
+
+drawGame();
