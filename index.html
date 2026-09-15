@@ -3,30 +3,84 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Priyanshu Hill Drive</title>
+
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
+  <!-- START / GAME OVER MENU -->
   <div id="menu">
-    <h1>PRIYANSHU HILL DRIVE</h1>
-    <p>Developer: Priyanshu Mishra</p>
-    <button id="startBtn">Start Game</button>
+
+    <div class="menu-card">
+
+      <div class="game-icon">🚗</div>
+
+      <h1>PRIYANSHU</h1>
+      <h2>HILL DRIVE</h2>
+
+      <p class="developer">
+        Developed by <strong>Priyanshu Mishra</strong>
+      </p>
+
+      <div class="best-box">
+        🏆 Best Distance:
+        <span id="menuBestScore">0</span> m
+      </div>
+
+      <button id="startBtn">
+        ▶ START GAME
+      </button>
+
+      <p class="instruction">
+        ⌨️ Use Arrow Keys / D to accelerate<br>
+        📱 Use GAS button on mobile
+      </p>
+
+    </div>
+
   </div>
 
+
+  <!-- GAME CANVAS -->
   <canvas id="gameCanvas"></canvas>
 
+
+  <!-- HUD -->
   <div id="hud">
-    <span>Distance: <b id="distance">0</b> m</span>
-    <span>Coins: <b id="coins">0</b></span>
-    <span>Fuel: <b id="fuel">100</b>%</span>
+
+    <div class="hud-item">
+      📏 <span id="distance">0</span> m
+    </div>
+
+    <div class="hud-item">
+      🪙 <span id="coins">0</span>
+    </div>
+
+    <div class="hud-item">
+      ⛽ <span id="fuel">100</span>%
+    </div>
+
   </div>
 
+
+  <!-- MOBILE CONTROLS -->
   <div id="controls">
-    <button id="brake">Brake</button>
-    <button id="gas">Gas</button>
+
+    <button id="brakeBtn" class="control brake">
+      ◀ BRAKE
+    </button>
+
+    <button id="gasBtn" class="control gas">
+      GAS ▶
+    </button>
+
   </div>
 
-  <script src="game.js"></script>
+
+  <script src="script.js"></script>
+
 </body>
 </html>
