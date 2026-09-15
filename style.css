@@ -1,104 +1,391 @@
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-body{
-  overflow:hidden;
-  font-family:Arial, Helvetica, sans-serif;
-  background:#87CEEB;
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
-#menu{
-  position:absolute;
-  width:100%;
-  height:100%;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  background:linear-gradient(#4facfe,#00c6ff);
-  color:white;
-  z-index:10;
+body {
+  background: #87ceeb;
 }
 
-#menu h1{
-  font-size:42px;
-  margin-bottom:10px;
+
+/* =========================
+   CANVAS
+========================= */
+
+#gameCanvas {
+  position: fixed;
+  inset: 0;
+
+  width: 100vw;
+  height: 100vh;
+
+  display: block;
 }
 
-#menu p{
-  font-size:18px;
-  margin-bottom:20px;
+
+/* =========================
+   MENU
+========================= */
+
+#menu {
+  position: fixed;
+  inset: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background:
+    radial-gradient(
+      circle at top,
+      rgba(255,255,255,0.25),
+      transparent 40%
+    ),
+    linear-gradient(
+      135deg,
+      #1976d2,
+      #00bcd4,
+      #43a047
+    );
+
+  z-index: 100;
 }
 
-#startBtn{
-  padding:15px 35px;
-  font-size:22px;
-  border:none;
-  border-radius:12px;
-  background:#4CAF50;
-  color:white;
-  cursor:pointer;
+
+/* =========================
+   MENU CARD
+========================= */
+
+.menu-card {
+  width: min(90%, 480px);
+
+  padding: 42px 30px;
+
+  text-align: center;
+
+  border-radius: 28px;
+
+  background: rgba(0, 0, 0, 0.35);
+
+  backdrop-filter: blur(18px);
+
+  border: 1px solid rgba(255,255,255,0.25);
+
+  box-shadow:
+    0 25px 60px rgba(0,0,0,0.35);
+
+  color: white;
 }
 
-#gameCanvas{
-  display:block;
-  width:100vw;
-  height:100vh;
+
+.game-icon {
+  font-size: 65px;
+
+  margin-bottom: 10px;
+
+  filter: drop-shadow(
+    0 8px 8px rgba(0,0,0,0.3)
+  );
 }
 
-#hud{
-  position:absolute;
-  top:10px;
-  left:10px;
-  right:10px;
-  display:none;
-  justify-content:space-between;
-  color:white;
-  font-size:18px;
-  text-shadow:2px 2px 4px black;
-  z-index:5;
+
+.menu-card h1 {
+  font-size: clamp(28px, 6vw, 45px);
+
+  letter-spacing: 4px;
+
+  font-weight: 900;
 }
 
-#controls{
-  position:absolute;
-  bottom:20px;
-  width:100%;
-  display:none;
-  justify-content:space-between;
-  padding:0 20px;
-  z-index:5;
+
+.menu-card h2 {
+  font-size: clamp(25px, 5vw, 38px);
+
+  letter-spacing: 5px;
+
+  color: #ffd54f;
+
+  margin-bottom: 15px;
 }
 
-#controls button{
-  width:140px;
-  height:65px;
-  border:none;
-  border-radius:15px;
-  background:#222;
-  color:white;
-  font-size:20px;
-  opacity:0.9;
+
+.developer {
+  font-size: 16px;
+
+  opacity: 0.9;
+
+  margin-bottom: 25px;
 }
 
-#controls button:active{
-  transform:scale(0.96);
+
+.best-box {
+  display: inline-block;
+
+  padding: 12px 20px;
+
+  margin-bottom: 25px;
+
+  border-radius: 14px;
+
+  background: rgba(255,255,255,0.12);
+
+  font-size: 17px;
 }
 
-@media(max-width:768px){
-  #menu h1{
-    font-size:32px;
+
+#menuBestScore {
+  font-weight: bold;
+
+  color: #ffd54f;
+}
+
+
+/* =========================
+   START BUTTON
+========================= */
+
+#startBtn {
+  width: 100%;
+
+  padding: 17px;
+
+  border: none;
+
+  border-radius: 15px;
+
+  background: linear-gradient(
+    135deg,
+    #00c853,
+    #64dd17
+  );
+
+  color: white;
+
+  font-size: 20px;
+
+  font-weight: 800;
+
+  letter-spacing: 1px;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 8px 20px rgba(0,0,0,0.25);
+
+  transition: 0.2s;
+}
+
+
+#startBtn:hover {
+  transform: translateY(-3px);
+
+  box-shadow:
+    0 12px 25px rgba(0,0,0,0.3);
+}
+
+
+#startBtn:active {
+  transform: scale(0.97);
+}
+
+
+.instruction {
+  margin-top: 20px;
+
+  line-height: 1.7;
+
+  font-size: 13px;
+
+  opacity: 0.75;
+}
+
+
+/* =========================
+   HUD
+========================= */
+
+#hud {
+  position: fixed;
+
+  top: 15px;
+  left: 15px;
+  right: 15px;
+
+  display: none;
+
+  justify-content: space-between;
+
+  gap: 10px;
+
+  z-index: 20;
+
+  pointer-events: none;
+}
+
+
+.hud-item {
+  min-width: 100px;
+
+  padding: 11px 15px;
+
+  border-radius: 13px;
+
+  text-align: center;
+
+  background: rgba(0,0,0,0.45);
+
+  backdrop-filter: blur(8px);
+
+  color: white;
+
+  font-size: 16px;
+
+  font-weight: bold;
+
+  box-shadow:
+    0 5px 15px rgba(0,0,0,0.2);
+}
+
+
+/* =========================
+   CONTROLS
+========================= */
+
+#controls {
+  position: fixed;
+
+  left: 0;
+  right: 0;
+  bottom: 20px;
+
+  padding: 0 20px;
+
+  display: none;
+
+  justify-content: space-between;
+
+  z-index: 30;
+
+  pointer-events: none;
+}
+
+
+.control {
+  width: 145px;
+  height: 65px;
+
+  border: none;
+
+  border-radius: 18px;
+
+  color: white;
+
+  font-size: 18px;
+
+  font-weight: 900;
+
+  cursor: pointer;
+
+  pointer-events: auto;
+
+  user-select: none;
+
+  -webkit-user-select: none;
+
+  box-shadow:
+    0 8px 20px rgba(0,0,0,0.3);
+
+  transition: 0.1s;
+}
+
+
+.control:active {
+  transform: scale(0.94);
+}
+
+
+.brake {
+  background: linear-gradient(
+    135deg,
+    #d32f2f,
+    #ff5252
+  );
+}
+
+
+.gas {
+  background: linear-gradient(
+    135deg,
+    #00a152,
+    #00e676
+  );
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 600px) {
+
+  .menu-card {
+    padding: 32px 22px;
   }
 
-  #controls button{
-    width:120px;
-    height:60px;
-    font-size:18px;
+  .game-icon {
+    font-size: 52px;
   }
 
-  #hud{
-    font-size:16px;
+  .hud-item {
+    min-width: auto;
+
+    padding: 9px 11px;
+
+    font-size: 13px;
+  }
+
+  #controls {
+    bottom: 15px;
+
+    padding: 0 12px;
+  }
+
+  .control {
+    width: 125px;
+
+    height: 58px;
+
+    font-size: 16px;
+  }
+}
+
+
+/* =========================
+   SMALL PHONE
+========================= */
+
+@media (max-width: 380px) {
+
+  .hud-item {
+    padding: 8px;
+
+    font-size: 12px;
+  }
+
+  .control {
+    width: 110px;
+
+    height: 55px;
+
+    font-size: 14px;
   }
 }
