@@ -1,54 +1,48 @@
 /* =========================================================
    PRIYANSHU HILL DRIVE
-   STEP 9
-   MISSIONS + ACHIEVEMENTS + DAILY REWARDS
+   STEP 10
+   LEVEL + CHECKPOINT SYSTEM
 ========================================================= */
 
-
-/* =========================================================
-   ELEMENTS
-========================================================= */
-
-const canvas =
-    document.getElementById("gameCanvas");
-
-const ctx =
-    canvas.getContext("2d");
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
 
 
-const menu =
-    document.getElementById("menu");
+/* ================= ELEMENTS ================= */
 
-const startBtn =
-    document.getElementById("startBtn");
+const menu = document.getElementById("menu");
+const startBtn = document.getElementById("startBtn");
 
+const hud = document.getElementById("hud");
 
-const hud =
-    document.getElementById("hud");
+const distanceEl = document.getElementById("distance");
+const coinsEl = document.getElementById("coins");
+const fuelEl = document.getElementById("fuel");
+const livesEl = document.getElementById("lives");
 
-const distanceEl =
-    document.getElementById("distance");
+const currentLevelEl =
+    document.getElementById("currentLevel");
 
-const coinsEl =
-    document.getElementById("coins");
-
-const fuelEl =
-    document.getElementById("fuel");
-
-const livesEl =
-    document.getElementById("lives");
-
-
-const menuBestScore =
-    document.getElementById("menuBestScore");
+const checkpointEl =
+    document.getElementById("checkpoint");
 
 const menuCoins =
     document.getElementById("menuCoins");
 
+const menuBestScore =
+    document.getElementById("menuBestScore");
+
+const menuLevel =
+    document.getElementById("menuLevel");
+
+const levelText =
+    document.getElementById("levelText");
+
+const menuCheckpoint =
+    document.getElementById("menuCheckpoint");
 
 const countdownEl =
     document.getElementById("countdown");
-
 
 const controls =
     document.getElementById("controls");
@@ -59,13 +53,11 @@ const gasBtn =
 const brakeBtn =
     document.getElementById("brakeBtn");
 
-
 const pauseBtn =
     document.getElementById("pauseBtn");
 
 const soundBtn =
     document.getElementById("soundBtn");
-
 
 const pauseScreen =
     document.getElementById("pauseScreen");
@@ -76,57 +68,34 @@ const resumeBtn =
 const quitBtn =
     document.getElementById("quitBtn");
 
+const levelComplete =
+    document.getElementById("levelComplete");
 
-const toast =
-    document.getElementById("toast");
+const checkpointMessage =
+    document.getElementById("checkpointMessage");
 
-const toastIcon =
-    document.getElementById("toastIcon");
-
-const toastText =
-    document.getElementById("toastText");
+const continueBtn =
+    document.getElementById("continueBtn");
 
 
-/* =========================================================
-   CANVAS
-========================================================= */
+/* ================= CANVAS ================= */
 
-let W =
-    window.innerWidth;
-
-let H =
-    window.innerHeight;
-
+let W = innerWidth;
+let H = innerHeight;
 
 function resizeCanvas() {
 
-    W =
-        window.innerWidth;
-
-    H =
-        window.innerHeight;
-
+    W = innerWidth;
+    H = innerHeight;
 
     const dpr =
-        Math.min(
-            window.devicePixelRatio || 1,
-            2
-        );
+        Math.min(devicePixelRatio || 1, 2);
 
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
 
-    canvas.width =
-        Math.floor(W * dpr);
-
-    canvas.height =
-        Math.floor(H * dpr);
-
-
-    canvas.style.width =
-        W + "px";
-
-    canvas.style.height =
-        H + "px";
-
+    canvas.style.width = W + "px";
+    canvas.style.height = H + "px";
 
     ctx.setTransform(
         dpr,
@@ -136,9 +105,7 @@ function resizeCanvas() {
         0,
         0
     );
-
 }
-
 
 window.addEventListener(
     "resize",
@@ -148,72 +115,41 @@ window.addEventListener(
 resizeCanvas();
 
 
-/* =========================================================
-   VEHICLES
-========================================================= */
+/* ================= VEHICLES ================= */
 
 const vehicles = {
 
     car: {
-
         name: "RED RACER",
-
         price: 0,
-
-        acceleration: 0.19,
-
+        acceleration: .19,
         maxSpeed: 9.5,
-
-        fuelUsage: 0.018,
-
-        grip: 0.035,
-
+        fuelUsage: .018,
+        grip: .035,
         width: 82,
-
         height: 38
-
     },
-
 
     suv: {
-
         name: "BLUE SUV",
-
         price: 50,
-
-        acceleration: 0.24,
-
+        acceleration: .24,
         maxSpeed: 9,
-
-        fuelUsage: 0.015,
-
-        grip: 0.045,
-
-        width: 90,
-
-        height: 43
-
+        fuelUsage: .015,
+        grip: .045,
+        width: 88,
+        height: 42
     },
 
-
     bike: {
-
         name: "HILL BIKE",
-
         price: 100,
-
-        acceleration: 0.28,
-
+        acceleration: .28,
         maxSpeed: 12,
-
-        fuelUsage: 0.012,
-
-        grip: 0.025,
-
-        width: 64,
-
+        fuelUsage: .012,
+        grip: .025,
+        width: 62,
         height: 34
-
     }
 
 };
@@ -225,116 +161,27 @@ let selectedVehicle =
     ) || "car";
 
 
-/* =========================================================
-   SAVE DATA
-========================================================= */
-
-let unlockedVehicles;
-
-
-try {
-
-    unlockedVehicles =
-        JSON.parse(
-            localStorage.getItem(
-                "phd_unlockedVehicles"
-            ) || '["car"]'
-        );
-
-} catch (e) {
-
-    unlockedVehicles =
-        ["car"];
-
-}
-
-
-if (!Array.isArray(unlockedVehicles)) {
-
-    unlockedVehicles =
-        ["car"];
-
-}
-
-
-if (!unlockedVehicles.includes("car")) {
-
-    unlockedVehicles.unshift("car");
-
-}
-
-
-/* =========================================================
-   UPGRADES
-========================================================= */
-
-let upgrades;
-
-
-try {
-
-    upgrades =
-        JSON.parse(
-            localStorage.getItem(
-                "phd_upgrades"
-            ) ||
-            '{"engine":1,"tire":1,"fuel":1,"speed":1}'
-        );
-
-} catch (e) {
-
-    upgrades = {
-
-        engine: 1,
-
-        tire: 1,
-
-        fuel: 1,
-
-        speed: 1
-
-    };
-
-}
-
-
-upgrades.engine =
-    Math.max(
-        1,
-        Math.min(
-            5,
-            Number(upgrades.engine) || 1
-        )
+let unlockedVehicles =
+    JSON.parse(
+        localStorage.getItem(
+            "phd_unlockedVehicles"
+        ) || '["car"]'
     );
 
 
-upgrades.tire =
-    Math.max(
-        1,
-        Math.min(
-            5,
-            Number(upgrades.tire) || 1
-        )
-    );
+/* ================= UPGRADES ================= */
 
-
-upgrades.fuel =
-    Math.max(
-        1,
-        Math.min(
-            5,
-            Number(upgrades.fuel) || 1
-        )
-    );
-
-
-upgrades.speed =
-    Math.max(
-        1,
-        Math.min(
-            5,
-            Number(upgrades.speed) || 1
-        )
+let upgrades =
+    JSON.parse(
+        localStorage.getItem(
+            "phd_upgrades"
+        ) ||
+        JSON.stringify({
+            engine: 1,
+            tire: 1,
+            fuel: 1,
+            speed: 1
+        })
     );
 
 
@@ -348,9 +195,7 @@ function saveUpgrades() {
 }
 
 
-/* =========================================================
-   COINS
-========================================================= */
+/* ================= SAVED DATA ================= */
 
 let totalCoins =
     Number(
@@ -368,303 +213,57 @@ let bestDistance =
     );
 
 
-menuCoins.textContent =
-    totalCoins;
-
-
-menuBestScore.textContent =
-    bestDistance;
-
-
-/* =========================================================
-   STEP 9 MISSIONS
-========================================================= */
-
-let missionData;
-
-
-try {
-
-    missionData =
-        JSON.parse(
-            localStorage.getItem(
-                "phd_missions"
-            ) ||
-            '{"distance":0,"coins":0,"fuel":0,"survivor":0}'
-        );
-
-} catch (e) {
-
-    missionData = {
-
-        distance: 0,
-
-        coins: 0,
-
-        fuel: 0,
-
-        survivor: 0
-
-    };
-
-}
-
-
-missionData.distance =
-    Number(missionData.distance) || 0;
-
-missionData.coins =
-    Number(missionData.coins) || 0;
-
-missionData.fuel =
-    Number(missionData.fuel) || 0;
-
-missionData.survivor =
-    Number(missionData.survivor) || 0;
-
-
-let missionClaimed;
-
-
-try {
-
-    missionClaimed =
-        JSON.parse(
-            localStorage.getItem(
-                "phd_missionClaimed"
-            ) ||
-            '{"distance":false,"coins":false,"fuel":false,"survivor":false}'
-        );
-
-} catch (e) {
-
-    missionClaimed = {
-
-        distance: false,
-
-        coins: false,
-
-        fuel: false,
-
-        survivor: false
-
-    };
-
-}
-
-
-function saveMissions() {
-
-    localStorage.setItem(
-        "phd_missions",
-        JSON.stringify(
-            missionData
-        )
-    );
-
-
-    localStorage.setItem(
-        "phd_missionClaimed",
-        JSON.stringify(
-            missionClaimed
-        )
-    );
-
-}
-
-
-/* =========================================================
-   ACHIEVEMENTS
-========================================================= */
-
-let achievements;
-
-
-try {
-
-    achievements =
-        JSON.parse(
-            localStorage.getItem(
-                "phd_achievements"
-            ) ||
-            "{}"
-        );
-
-} catch (e) {
-
-    achievements = {};
-
-}
-
-
-const achievementRewards = {
-
-    firstDrive: 20,
-
-    distance1000: 40,
-
-    coins100: 50,
-
-    vehicle: 50,
-
-    upgrade: 75
-
-};
-
-
-function saveAchievements() {
-
-    localStorage.setItem(
-        "phd_achievements",
-        JSON.stringify(
-            achievements
-        )
-    );
-
-}
-
-
-/* =========================================================
-   DAILY REWARD
-========================================================= */
-
-const rewardAmounts = [
-
-    25,
-
-    35,
-
-    50,
-
-    65,
-
-    80,
-
-    100,
-
-    150
-
-];
-
-
-let rewardDay =
+let highestLevel =
     Number(
         localStorage.getItem(
-            "phd_rewardDay"
+            "phd_highestLevel"
         ) || 1
     );
 
 
-let lastRewardDate =
-    localStorage.getItem(
-        "phd_lastRewardDate"
-    ) || "";
+/* ================= GAME STATE ================= */
+
+let running = false;
+let paused = false;
+let gameOver = false;
+let countdownRunning = false;
+
+let distance = 0;
+let runCoins = 0;
+
+let fuel = 100;
+let lives = 3;
+
+let speed = 0;
+
+let carX = 220;
+let carY = 300;
+
+let carVelocityY = 0;
+let carAngle = 0;
+
+let cameraX = 0;
+
+let gasPressed = false;
+let brakePressed = false;
+
+let currentLevel = highestLevel;
+
+let checkpoints = 0;
+
+let nextCheckpoint = 500;
+
+let checkpointBonus = 25;
+
+let lastTime = 0;
+
+let terrain = [];
+let coins = [];
+let fuelItems = [];
+let obstacles = [];
 
 
-function getTodayKey() {
-
-    const now =
-        new Date();
-
-
-    const year =
-        now.getFullYear();
-
-
-    const month =
-        String(
-            now.getMonth() + 1
-        ).padStart(
-            2,
-            "0"
-        );
-
-
-    const day =
-        String(
-            now.getDate()
-        ).padStart(
-            2,
-            "0"
-        );
-
-
-    return (
-        year +
-        "-" +
-        month +
-        "-" +
-        day
-    );
-
-}
-
-
-function getYesterdayKey() {
-
-    const date =
-        new Date();
-
-
-    date.setDate(
-        date.getDate() - 1
-    );
-
-
-    const year =
-        date.getFullYear();
-
-
-    const month =
-        String(
-            date.getMonth() + 1
-        ).padStart(
-            2,
-            "0"
-        );
-
-
-    const day =
-        String(
-            date.getDate()
-        ).padStart(
-            2,
-            "0"
-        );
-
-
-    return (
-        year +
-        "-" +
-        month +
-        "-" +
-        day
-    );
-
-}
-
-
-/* Reset streak if a day was missed */
-
-if (
-    lastRewardDate &&
-    lastRewardDate !== getTodayKey() &&
-    lastRewardDate !== getYesterdayKey()
-) {
-
-    rewardDay = 1;
-
-    localStorage.setItem(
-        "phd_rewardDay",
-        rewardDay
-    );
-
-}
-
-
-/* =========================================================
-   SOUND
-========================================================= */
+/* ================= AUDIO ================= */
 
 let soundEnabled =
     localStorage.getItem(
@@ -672,44 +271,27 @@ let soundEnabled =
     ) !== "false";
 
 
-let audioCtx =
-    null;
-
-let engineOscillator =
-    null;
-
-let engineGain =
-    null;
+let audioCtx = null;
+let engineOscillator = null;
+let engineGain = null;
 
 
 function initAudio() {
 
-    if (!soundEnabled) {
-        return;
-    }
-
+    if (!soundEnabled) return;
 
     if (!audioCtx) {
 
-        const AudioContext =
-            window.AudioContext ||
-            window.webkitAudioContext;
-
-
-        if (AudioContext) {
-
-            audioCtx =
-                new AudioContext();
-
-        }
+        audioCtx =
+            new (
+                window.AudioContext ||
+                window.webkitAudioContext
+            )();
 
     }
 
-
     if (
-        audioCtx &&
-        audioCtx.state ===
-        "suspended"
+        audioCtx.state === "suspended"
     ) {
 
         audioCtx.resume();
@@ -720,135 +302,86 @@ function initAudio() {
 
 
 function playTone(
-    frequency = 500,
-    duration = 0.08,
+    frequency,
+    duration = .1,
     type = "sine",
-    volume = 0.05
+    volume = .05
 ) {
 
-    if (!soundEnabled) {
-        return;
-    }
-
+    if (!soundEnabled) return;
 
     initAudio();
 
+    if (!audioCtx) return;
 
-    if (!audioCtx) {
-        return;
-    }
+    const osc =
+        audioCtx.createOscillator();
 
+    const gain =
+        audioCtx.createGain();
 
-    try {
+    osc.type = type;
 
-        const oscillator =
-            audioCtx.createOscillator();
+    osc.frequency.value =
+        frequency;
 
+    gain.gain.setValueAtTime(
+        volume,
+        audioCtx.currentTime
+    );
 
-        const gain =
-            audioCtx.createGain();
+    gain.gain.exponentialRampToValueAtTime(
+        .001,
+        audioCtx.currentTime + duration
+    );
 
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
 
-        oscillator.type =
-            type;
+    osc.start();
 
-
-        oscillator.frequency.value =
-            frequency;
-
-
-        gain.gain.setValueAtTime(
-            volume,
-            audioCtx.currentTime
-        );
-
-
-        gain.gain.exponentialRampToValueAtTime(
-            0.001,
-            audioCtx.currentTime +
-            duration
-        );
-
-
-        oscillator.connect(gain);
-
-        gain.connect(
-            audioCtx.destination
-        );
-
-
-        oscillator.start();
-
-
-        oscillator.stop(
-            audioCtx.currentTime +
-            duration
-        );
-
-    } catch (e) {}
+    osc.stop(
+        audioCtx.currentTime + duration
+    );
 
 }
 
 
 function startEngineSound() {
 
-    if (!soundEnabled) {
-        return;
-    }
-
+    if (!soundEnabled) return;
 
     initAudio();
-
 
     if (
         !audioCtx ||
         engineOscillator
-    ) {
-        return;
-    }
+    ) return;
 
+    engineOscillator =
+        audioCtx.createOscillator();
 
-    try {
+    engineGain =
+        audioCtx.createGain();
 
-        engineOscillator =
-            audioCtx.createOscillator();
+    engineOscillator.type =
+        "sawtooth";
 
+    engineOscillator.frequency.value =
+        70;
 
-        engineGain =
-            audioCtx.createGain();
+    engineGain.gain.value =
+        .015;
 
+    engineOscillator.connect(
+        engineGain
+    );
 
-        engineOscillator.type =
-            "sawtooth";
+    engineGain.connect(
+        audioCtx.destination
+    );
 
-
-        engineOscillator.frequency.value =
-            70;
-
-
-        engineGain.gain.value =
-            0.015;
-
-
-        engineOscillator.connect(
-            engineGain
-        );
-
-
-        engineGain.connect(
-            audioCtx.destination
-        );
-
-
-        engineOscillator.start();
-
-    } catch (e) {
-
-        engineOscillator = null;
-
-        engineGain = null;
-
-    }
+    engineOscillator.start();
 
 }
 
@@ -859,24 +392,12 @@ function updateEngineSound() {
         !engineOscillator ||
         !audioCtx ||
         !soundEnabled
-    ) {
-        return;
-    }
+    ) return;
 
-
-    try {
-
-        engineOscillator.frequency.linearRampToValueAtTime(
-
-            60 +
-            Math.abs(speed) * 18,
-
-            audioCtx.currentTime +
-            0.08
-
-        );
-
-    } catch (e) {}
+    engineOscillator.frequency.linearRampToValueAtTime(
+        60 + Math.abs(speed) * 18,
+        audioCtx.currentTime + .08
+    );
 
 }
 
@@ -889,11 +410,8 @@ function stopEngineSound() {
             engineOscillator.stop();
         } catch (e) {}
 
-        engineOscillator =
-            null;
-
-        engineGain =
-            null;
+        engineOscillator = null;
+        engineGain = null;
 
     }
 
@@ -915,32 +433,24 @@ updateSoundButton();
 
 soundBtn.addEventListener(
     "click",
-    function () {
+    () => {
 
         soundEnabled =
             !soundEnabled;
 
-
         localStorage.setItem(
             "phd_sound",
-            String(soundEnabled)
+            soundEnabled
         );
 
-
         updateSoundButton();
-
 
         if (soundEnabled) {
 
             initAudio();
 
-            if (
-                running &&
-                !paused
-            ) {
-
+            if (running && !paused) {
                 startEngineSound();
-
             }
 
         } else {
@@ -953,331 +463,80 @@ soundBtn.addEventListener(
 );
 
 
-/* =========================================================
-   GAME STATE
-========================================================= */
+/* ================= GARAGE ================= */
 
-let running =
-    false;
+function getUpgradeCost(type) {
 
-let paused =
-    false;
-
-let gameOver =
-    false;
-
-let countdownRunning =
-    false;
-
-
-let distance =
-    0;
-
-let runCoins =
-    0;
-
-let runFuelCollected =
-    0;
-
-
-let fuel =
-    100;
-
-let lives =
-    3;
-
-
-let speed =
-    0;
-
-
-let carX =
-    220;
-
-let carY =
-    300;
-
-
-let carVelocityY =
-    0;
-
-let carAngle =
-    0;
-
-
-let cameraX =
-    0;
-
-
-let gasPressed =
-    false;
-
-let brakePressed =
-    false;
-
-
-let lastTime =
-    0;
-
-
-let terrain =
-    [];
-
-let coinItems =
-    [];
-
-let fuelItems =
-    [];
-
-let obstacles =
-    [];
-
-
-/* =========================================================
-   TOAST
-========================================================= */
-
-let toastTimer =
-    null;
-
-
-function showToast(
-    icon,
-    message
-) {
-
-    toastIcon.textContent =
-        icon;
-
-    toastText.textContent =
-        message;
-
-
-    toast.classList.add(
-        "show"
-    );
-
-
-    clearTimeout(
-        toastTimer
-    );
-
-
-    toastTimer =
-        setTimeout(
-            function () {
-
-                toast.classList.remove(
-                    "show"
-                );
-
-            },
-            2200
-        );
-
-}
-
-
-/* =========================================================
-   MENU TABS
-========================================================= */
-
-document
-    .querySelectorAll(".menu-tab")
-    .forEach(
-        function (tab) {
-
-            tab.addEventListener(
-                "click",
-                function () {
-
-                    const target =
-                        tab.dataset.panel;
-
-
-                    document
-                        .querySelectorAll(
-                            ".menu-tab"
-                        )
-                        .forEach(
-                            function (item) {
-
-                                item.classList.remove(
-                                    "active"
-                                );
-
-                            }
-                        );
-
-
-                    document
-                        .querySelectorAll(
-                            ".menu-panel"
-                        )
-                        .forEach(
-                            function (panel) {
-
-                                panel.classList.remove(
-                                    "active"
-                                );
-
-                            }
-                        );
-
-
-                    tab.classList.add(
-                        "active"
-                    );
-
-
-                    const panel =
-                        document.getElementById(
-                            target
-                        );
-
-
-                    if (panel) {
-
-                        panel.classList.add(
-                            "active"
-                        );
-
-                    }
-
-                }
-            );
-
-        }
-    );
-
-
-/* =========================================================
-   GARAGE
-========================================================= */
-
-function getUpgradeCost(
-    type
-) {
-
-    return (
-        20 *
-        Number(upgrades[type])
-    );
+    return 20 * upgrades[type];
 
 }
 
 
 function updateGarageUI() {
 
-    const types = [
-        "engine",
-        "tire",
-        "fuel",
-        "speed"
+    const data = [
+        ["engine","engine"],
+        ["tire","tire"],
+        ["fuel","fuel"],
+        ["speed","speed"]
     ];
 
-
-    types.forEach(
-        function (type) {
+    data.forEach(
+        ([type,id]) => {
 
             const level =
-                Math.max(
-                    1,
-                    Math.min(
-                        5,
-                        Number(
-                            upgrades[type]
-                        ) || 1
-                    )
-                );
-
-
-            const levelId =
-                type === "tire"
-                    ? "tireLevel"
-                    : type + "Level";
-
-
-            const progressId =
-                type === "tire"
-                    ? "tireProgress"
-                    : type + "Progress";
-
-
-            const buttonId =
-                type === "tire"
-                    ? "tireUpgrade"
-                    : type + "Upgrade";
-
+                upgrades[type];
 
             const levelEl =
                 document.getElementById(
-                    levelId
+                    id === "tire"
+                        ? "tireLevel"
+                        : id + "Level"
                 );
-
 
             const progressEl =
                 document.getElementById(
-                    progressId
+                    id === "tire"
+                        ? "tireProgress"
+                        : id + "Progress"
                 );
-
 
             const button =
                 document.getElementById(
-                    buttonId
+                    id === "tire"
+                        ? "tireUpgrade"
+                        : id + "Upgrade"
                 );
 
 
-            if (levelEl) {
+            levelEl.textContent =
+                level;
 
-                levelEl.textContent =
-                    level;
-
-            }
-
-
-            if (progressEl) {
-
-                progressEl.style.width =
-                    (
-                        level /
-                        5 *
-                        100
-                    ) +
-                    "%";
-
-            }
+            progressEl.style.width =
+                (level / 5 * 100) + "%";
 
 
-            if (button) {
+            if (level >= 5) {
 
-                if (level >= 5) {
+                button.textContent =
+                    "MAX";
 
-                    button.textContent =
-                        "MAX";
+                button.classList.add(
+                    "maxed"
+                );
 
-                    button.classList.add(
-                        "maxed"
-                    );
+                button.disabled = true;
 
-                    button.disabled =
-                        true;
+            } else {
 
-                } else {
+                button.innerHTML =
+                    `🪙 <span>${getUpgradeCost(type)}</span>`;
 
-                    button.innerHTML =
-                        "🪙 <span>" +
-                        getUpgradeCost(type) +
-                        "</span>";
+                button.classList.remove(
+                    "maxed"
+                );
 
-                    button.classList.remove(
-                        "maxed"
-                    );
-
-                    button.disabled =
-                        false;
-
-                }
+                button.disabled = false;
 
             }
 
@@ -1285,7 +544,9 @@ function updateGarageUI() {
     );
 
 
-    const garageLevel =
+    document.getElementById(
+        "garageLevel"
+    ).textContent =
         Math.max(
             upgrades.engine,
             upgrades.tire,
@@ -1293,1163 +554,288 @@ function updateGarageUI() {
             upgrades.speed
         );
 
-
-    document.getElementById(
-        "garageLevel"
-    ).textContent =
-        garageLevel;
-
-
-    checkAchievements();
-
 }
 
 
-function purchaseUpgrade(
-    type
-) {
+function purchaseUpgrade(type) {
 
-    if (
-        upgrades[type] >= 5
-    ) {
+    if (upgrades[type] >= 5) {
         return;
     }
-
 
     const cost =
         getUpgradeCost(type);
 
 
-    if (
-        totalCoins < cost
-    ) {
+    if (totalCoins < cost) {
 
         playTone(
             180,
-            0.12,
-            "square",
-            0.04
+            .1,
+            "square"
         );
 
-
-        showToast(
-            "❌",
-            "Not enough coins! Need " +
-            cost
+        alert(
+            `You need ${cost} coins.`
         );
-
 
         return;
-
     }
 
 
-    totalCoins -=
-        cost;
-
+    totalCoins -= cost;
 
     upgrades[type]++;
-
 
     localStorage.setItem(
         "phd_totalCoins",
         totalCoins
     );
 
-
     saveUpgrades();
 
-
-    menuCoins.textContent =
-        totalCoins;
-
+    updateMenu();
 
     updateGarageUI();
 
-
     playTone(
-        800,
-        0.08,
-        "triangle",
-        0.06
+        900,
+        .08,
+        "triangle"
     );
-
-
-    setTimeout(
-        function () {
-
-            playTone(
-                1100,
-                0.12,
-                "triangle",
-                0.05
-            );
-
-        },
-        90
-    );
-
-
-    checkAchievements();
 
 }
 
 
-document
-    .getElementById(
-        "engineUpgrade"
-    )
-    .addEventListener(
-        "click",
-        function () {
-
-            purchaseUpgrade(
-                "engine"
-            );
-
-        }
-    );
+document.getElementById(
+    "engineUpgrade"
+).onclick =
+    () => purchaseUpgrade("engine");
 
 
-document
-    .getElementById(
-        "tireUpgrade"
-    )
-    .addEventListener(
-        "click",
-        function () {
-
-            purchaseUpgrade(
-                "tire"
-            );
-
-        }
-    );
+document.getElementById(
+    "tireUpgrade"
+).onclick =
+    () => purchaseUpgrade("tire");
 
 
-document
-    .getElementById(
-        "fuelUpgrade"
-    )
-    .addEventListener(
-        "click",
-        function () {
-
-            purchaseUpgrade(
-                "fuel"
-            );
-
-        }
-    );
+document.getElementById(
+    "fuelUpgrade"
+).onclick =
+    () => purchaseUpgrade("fuel");
 
 
-document
-    .getElementById(
-        "speedUpgrade"
-    )
-    .addEventListener(
-        "click",
-        function () {
-
-            purchaseUpgrade(
-                "speed"
-            );
-
-        }
-    );
+document.getElementById(
+    "speedUpgrade"
+).onclick =
+    () => purchaseUpgrade("speed");
 
 
-/* =========================================================
-   VEHICLES
-========================================================= */
+/* ================= VEHICLES ================= */
 
 function updateVehicleUI() {
 
     document
-        .querySelectorAll(
-            ".vehicle-card"
-        )
-        .forEach(
-            function (card) {
+        .querySelectorAll(".vehicle-card")
+        .forEach(card => {
 
-                const type =
-                    card.dataset.vehicle;
+            const type =
+                card.dataset.vehicle;
 
+            const unlocked =
+                unlockedVehicles.includes(
+                    type
+                );
 
-                if (!vehicles[type]) {
-                    return;
-                }
-
-
-                const unlocked =
-                    unlockedVehicles.includes(
-                        type
-                    );
-
-
-                const status =
-                    card.querySelector(
-                        ".vehicle-status"
-                    );
-
-
-                card.classList.toggle(
-                    "selected",
-                    type ===
-                    selectedVehicle
+            const status =
+                card.querySelector(
+                    ".vehicle-status"
                 );
 
 
-                card.classList.toggle(
-                    "locked",
-                    !unlocked
-                );
+            card.classList.toggle(
+                "selected",
+                type === selectedVehicle
+            );
+
+            card.classList.toggle(
+                "locked",
+                !unlocked
+            );
 
 
-                if (status) {
+            if (!unlocked) {
 
-                    if (!unlocked) {
+                status.textContent =
+                    `🔒 ${vehicles[type].price} COINS`;
 
-                        status.textContent =
-                            "🔒 " +
-                            vehicles[type].price +
-                            " COINS";
+            } else if (
+                type === selectedVehicle
+            ) {
 
-                    } else if (
-                        type ===
-                        selectedVehicle
-                    ) {
+                status.textContent =
+                    "SELECTED";
 
-                        status.textContent =
-                            "SELECTED";
+            } else {
 
-                    } else {
-
-                        status.textContent =
-                            "SELECT";
-
-                    }
-
-                }
+                status.textContent =
+                    "SELECT";
 
             }
-        );
+
+        });
 
 }
 
 
 document
-    .querySelectorAll(
-        ".vehicle-card"
-    )
-    .forEach(
-        function (card) {
+    .querySelectorAll(".vehicle-card")
+    .forEach(card => {
 
-            card.addEventListener(
-                "click",
-                function () {
+        card.addEventListener(
+            "click",
+            () => {
 
-                    const type =
-                        card.dataset.vehicle;
+                const type =
+                    card.dataset.vehicle;
 
-
-                    const vehicle =
-                        vehicles[type];
+                const vehicle =
+                    vehicles[type];
 
 
-                    if (!vehicle) {
+                if (
+                    !unlockedVehicles.includes(
+                        type
+                    )
+                ) {
+
+                    if (
+                        totalCoins <
+                        vehicle.price
+                    ) {
+
+                        alert(
+                            `You need ${vehicle.price} coins.`
+                        );
+
                         return;
                     }
 
 
                     if (
-                        !unlockedVehicles.includes(
-                            type
+                        !confirm(
+                            `Unlock ${vehicle.name} for ${vehicle.price} coins?`
                         )
                     ) {
-
-                        if (
-                            totalCoins <
-                            vehicle.price
-                        ) {
-
-                            showToast(
-                                "🔒",
-                                "Need " +
-                                vehicle.price +
-                                " coins"
-                            );
-
-                            return;
-
-                        }
-
-
-                        const confirmed =
-                            confirm(
-                                "Unlock " +
-                                vehicle.name +
-                                " for " +
-                                vehicle.price +
-                                " coins?"
-                            );
-
-
-                        if (!confirmed) {
-                            return;
-                        }
-
-
-                        totalCoins -=
-                            vehicle.price;
-
-
-                        unlockedVehicles.push(
-                            type
-                        );
-
-
-                        localStorage.setItem(
-                            "phd_totalCoins",
-                            totalCoins
-                        );
-
-
-                        localStorage.setItem(
-                            "phd_unlockedVehicles",
-                            JSON.stringify(
-                                unlockedVehicles
-                            )
-                        );
-
-
-                        menuCoins.textContent =
-                            totalCoins;
-
-
-                        showToast(
-                            "🚙",
-                            vehicle.name +
-                            " unlocked!"
-                        );
-
-
-                        checkAchievements();
-
+                        return;
                     }
 
 
-                    selectedVehicle =
-                        type;
+                    totalCoins -=
+                        vehicle.price;
+
+                    unlockedVehicles.push(
+                        type
+                    );
 
 
                     localStorage.setItem(
-                        "phd_selectedVehicle",
-                        selectedVehicle
+                        "phd_totalCoins",
+                        totalCoins
                     );
 
-
-                    updateVehicleUI();
+                    localStorage.setItem(
+                        "phd_unlockedVehicles",
+                        JSON.stringify(
+                            unlockedVehicles
+                        )
+                    );
 
                 }
-            );
 
-        }
-    );
 
+                selectedVehicle =
+                    type;
 
-/* =========================================================
-   MISSIONS UI
-========================================================= */
-
-function updateMissionsUI() {
-
-    const distanceProgress =
-        Math.min(
-            500,
-            missionData.distance
-        );
-
-
-    const coinsProgress =
-        Math.min(
-            10,
-            missionData.coins
-        );
-
-
-    const fuelProgress =
-        Math.min(
-            2,
-            missionData.fuel
-        );
-
-
-    const survivorProgress =
-        Math.min(
-            1000,
-            missionData.survivor
-        );
-
-
-    document.getElementById(
-        "missionDistanceBar"
-    ).style.width =
-        (
-            distanceProgress /
-            500 *
-            100
-        ) +
-        "%";
-
-
-    document.getElementById(
-        "missionCoinsBar"
-    ).style.width =
-        (
-            coinsProgress /
-            10 *
-            100
-        ) +
-        "%";
-
-
-    document.getElementById(
-        "missionFuelBar"
-    ).style.width =
-        (
-            fuelProgress /
-            2 *
-            100
-        ) +
-        "%";
-
-
-    document.getElementById(
-        "missionSurvivorBar"
-    ).style.width =
-        (
-            survivorProgress /
-            1000 *
-            100
-        ) +
-        "%";
-
-
-    document.getElementById(
-        "missionDistanceText"
-    ).textContent =
-        distanceProgress +
-        " / 500 m";
-
-
-    document.getElementById(
-        "missionCoinsText"
-    ).textContent =
-        coinsProgress +
-        " / 10";
-
-
-    document.getElementById(
-        "missionFuelText"
-    ).textContent =
-        fuelProgress +
-        " / 2";
-
-
-    document.getElementById(
-        "missionSurvivorText"
-    ).textContent =
-        survivorProgress +
-        " / 1000 m";
-
-}
-
-
-/* =========================================================
-   COMPLETE MISSION
-========================================================= */
-
-function completeMission(
-    type,
-    reward,
-    message
-) {
-
-    if (
-        missionClaimed[type]
-    ) {
-        return;
-    }
-
-
-    missionClaimed[type] =
-        true;
-
-
-    totalCoins +=
-        reward;
-
-
-    localStorage.setItem(
-        "phd_totalCoins",
-        totalCoins
-    );
-
-
-    saveMissions();
-
-
-    menuCoins.textContent =
-        totalCoins;
-
-
-    playTone(
-        1000,
-        0.1,
-        "triangle",
-        0.06
-    );
-
-
-    setTimeout(
-        function () {
-
-            playTone(
-                1400,
-                0.15,
-                "triangle",
-                0.06
-            );
-
-        },
-        100
-    );
-
-
-    showToast(
-        "🎯",
-        message +
-        " +" +
-        reward +
-        " coins"
-    );
-
-
-    updateMissionsUI();
-
-}
-
-
-/* =========================================================
-   CHECK MISSIONS
-========================================================= */
-
-function checkMissions() {
-
-    if (
-        missionData.distance >=
-        500
-    ) {
-
-        completeMission(
-            "distance",
-            25,
-            "500m Mission Complete!"
-        );
-
-    }
-
-
-    if (
-        missionData.coins >=
-        10
-    ) {
-
-        completeMission(
-            "coins",
-            30,
-            "Coin Hunter Complete!"
-        );
-
-    }
-
-
-    if (
-        missionData.fuel >=
-        2
-    ) {
-
-        completeMission(
-            "fuel",
-            25,
-            "Fuel Saver Complete!"
-        );
-
-    }
-
-
-    if (
-        missionData.survivor >=
-        1000
-    ) {
-
-        completeMission(
-            "survivor",
-            50,
-            "Survivor Mission Complete!"
-        );
-
-    }
-
-
-    updateMissionsUI();
-
-}
-
-
-/* =========================================================
-   ACHIEVEMENT UNLOCK
-========================================================= */
-
-function unlockAchievement(
-    key,
-    icon,
-    name
-) {
-
-    if (
-        achievements[key]
-    ) {
-        return;
-    }
-
-
-    achievements[key] =
-        true;
-
-
-    const reward =
-        achievementRewards[key] ||
-        0;
-
-
-    totalCoins +=
-        reward;
-
-
-    localStorage.setItem(
-        "phd_totalCoins",
-        totalCoins
-    );
-
-
-    saveAchievements();
-
-
-    menuCoins.textContent =
-        totalCoins;
-
-
-    playTone(
-        800,
-        0.1,
-        "triangle",
-        0.06
-    );
-
-
-    setTimeout(
-        function () {
-
-            playTone(
-                1200,
-                0.1,
-                "triangle",
-                0.06
-            );
-
-        },
-        100
-    );
-
-
-    showToast(
-        icon,
-        name +
-        " +" +
-        reward +
-        " coins"
-    );
-
-
-    updateAchievementUI();
-
-}
-
-
-/* =========================================================
-   CHECK ACHIEVEMENTS
-========================================================= */
-
-function checkAchievements() {
-
-    if (
-        Number(
-            localStorage.getItem(
-                "phd_hasPlayed"
-            ) || 0
-        ) === 1
-    ) {
-
-        unlockAchievement(
-            "firstDrive",
-            "🚀",
-            "First Drive!"
-        );
-
-    }
-
-
-    if (
-        bestDistance >=
-        1000
-    ) {
-
-        unlockAchievement(
-            "distance1000",
-            "🏔️",
-            "Mountain Master!"
-        );
-
-    }
-
-
-    if (
-        totalCoins >=
-        100
-    ) {
-
-        unlockAchievement(
-            "coins100",
-            "💰",
-            "Coin Collector!"
-        );
-
-    }
-
-
-    if (
-        unlockedVehicles.length >=
-        2
-    ) {
-
-        unlockAchievement(
-            "vehicle",
-            "🚙",
-            "Garage Owner!"
-        );
-
-    }
-
-
-    if (
-        upgrades.engine >= 5 ||
-        upgrades.tire >= 5 ||
-        upgrades.fuel >= 5 ||
-        upgrades.speed >= 5
-    ) {
-
-        unlockAchievement(
-            "upgrade",
-            "⚡",
-            "Max Power!"
-        );
-
-    }
-
-
-    updateAchievementUI();
-
-}
-
-
-function updateAchievementUI() {
-
-    const map = {
-
-        firstDrive:
-            "achievementFirstDrive",
-
-        distance1000:
-            "achievement1000",
-
-        coins100:
-            "achievement100Coins",
-
-        vehicle:
-            "achievementVehicle",
-
-        upgrade:
-            "achievementUpgrade"
-
-    };
-
-
-    Object.keys(map).forEach(
-        function (key) {
-
-            const element =
-                document.getElementById(
-                    map[key]
+                localStorage.setItem(
+                    "phd_selectedVehicle",
+                    type
                 );
 
-
-            if (!element) {
-                return;
-            }
-
-
-            if (
-                achievements[key]
-            ) {
-
-                element.textContent =
-                    "🏆";
-
-                element.classList.add(
-                    "unlocked"
-                );
-
-            } else {
-
-                element.textContent =
-                    "🔒";
-
-                element.classList.remove(
-                    "unlocked"
-                );
+                updateVehicleUI();
+                updateMenu();
 
             }
-
-        }
-    );
-
-}
-
-
-/* =========================================================
-   DAILY REWARD UI
-========================================================= */
-
-function updateRewardUI() {
-
-    const today =
-        getTodayKey();
-
-
-    const alreadyClaimed =
-        lastRewardDate ===
-        today;
-
-
-    document.getElementById(
-        "rewardDay"
-    ).textContent =
-        rewardDay;
-
-
-    for (
-        let i = 1;
-        i <= 7;
-        i++
-    ) {
-
-        const element =
-            document.getElementById(
-                "reward" + i
-            );
-
-
-        if (!element) {
-            continue;
-        }
-
-
-        element.classList.remove(
-            "today"
         );
 
+    });
 
-        element.classList.remove(
-            "claimed"
-        );
 
-
-        if (
-            i < rewardDay
-        ) {
-
-            element.classList.add(
-                "claimed"
-            );
-
-        }
-
-
-        if (
-            i === rewardDay &&
-            !alreadyClaimed
-        ) {
-
-            element.classList.add(
-                "today"
-            );
-
-        }
-
-    }
-
-
-    const claimButton =
-        document.getElementById(
-            "claimRewardBtn"
-        );
-
-
-    const message =
-        document.getElementById(
-            "rewardMessage"
-        );
-
-
-    if (
-        alreadyClaimed
-    ) {
-
-        claimButton.disabled =
-            true;
-
-
-        claimButton.textContent =
-            "✅ REWARD CLAIMED";
-
-
-        message.textContent =
-            "Come back tomorrow for your next reward.";
-
-    } else {
-
-        claimButton.disabled =
-            false;
-
-
-        claimButton.textContent =
-            "🎁 CLAIM " +
-            rewardAmounts[
-                rewardDay - 1
-            ] +
-            " COINS";
-
-
-        message.textContent =
-            "Your daily reward is waiting!";
-
-    }
-
-}
-
-
-/* =========================================================
-   CLAIM DAILY REWARD
-========================================================= */
-
-document
-    .getElementById(
-        "claimRewardBtn"
-    )
-    .addEventListener(
-        "click",
-        function () {
-
-            const today =
-                getTodayKey();
-
-
-            if (
-                lastRewardDate ===
-                today
-            ) {
-
-                return;
-
-            }
-
-
-            const reward =
-                rewardAmounts[
-                    rewardDay - 1
-                ];
-
-
-            totalCoins +=
-                reward;
-
-
-            lastRewardDate =
-                today;
-
-
-            localStorage.setItem(
-                "phd_totalCoins",
-                totalCoins
-            );
-
-
-            localStorage.setItem(
-                "phd_lastRewardDate",
-                lastRewardDate
-            );
-
-
-            if (
-                rewardDay >= 7
-            ) {
-
-                rewardDay = 1;
-
-            } else {
-
-                rewardDay++;
-
-            }
-
-
-            localStorage.setItem(
-                "phd_rewardDay",
-                rewardDay
-            );
-
-
-            menuCoins.textContent =
-                totalCoins;
-
-
-            playTone(
-                700,
-                0.1,
-                "triangle",
-                0.06
-            );
-
-
-            setTimeout(
-                function () {
-
-                    playTone(
-                        1100,
-                        0.1,
-                        "triangle",
-                        0.06
-                    );
-
-                },
-                100
-            );
-
-
-            showToast(
-                "🎁",
-                "Daily Reward +" +
-                reward +
-                " coins!"
-            );
-
-
-            updateRewardUI();
-
-        }
-    );
-
-
-/* =========================================================
-   TERRAIN
-========================================================= */
+/* ================= TERRAIN ================= */
 
 function generateTerrain() {
 
     terrain = [];
 
-
-    const step =
-        70;
-
+    const step = 70;
 
     let y =
-        H * 0.67;
+        H * .68;
+
+    let slope = 0;
 
 
-    let slope =
-        0;
+    const difficulty =
+        1 +
+        (currentLevel - 1) * .08;
 
 
     for (
         let x = -500;
-        x <= 30000;
+        x < 35000;
         x += step
     ) {
 
         slope +=
-            (
-                Math.random() -
-                0.5
-            ) *
-            0.18;
+            (Math.random() - .5)
+            * .22
+            * difficulty;
 
-
-        slope *=
-            0.91;
-
+        slope *= .92;
 
         slope =
             Math.max(
-                -0.55,
+                -.75,
                 Math.min(
-                    0.55,
+                    .75,
                     slope
                 )
             );
 
 
         y +=
-            slope *
-            15;
+            slope * 15;
 
 
         y +=
             Math.sin(
-                x *
-                0.006
-            ) *
-            2;
+                x * .006
+            ) * 2;
 
 
         y =
             Math.max(
-                H * 0.43,
+                H * .42,
                 Math.min(
-                    H * 0.80,
+                    H * .82,
                     y
                 )
             );
 
 
         terrain.push({
-
-            x: x,
-
-            y: y
-
+            x,
+            y
         });
 
     }
@@ -2459,157 +845,96 @@ function generateTerrain() {
 
 function getGroundY(x) {
 
-    if (
-        !terrain.length
-    ) {
-
-        return H * 0.67;
-
+    if (!terrain.length) {
+        return H * .68;
     }
 
 
-    if (
-        x <=
-        terrain[0].x
+    for (
+        let i = 0;
+        i < terrain.length - 1;
+        i++
     ) {
 
-        return terrain[0].y;
+        const a =
+            terrain[i];
 
-    }
-
-
-    const step =
-        70;
+        const b =
+            terrain[i + 1];
 
 
-    let index =
-        Math.floor(
-            (x + 500) /
-            step
-        );
+        if (
+            x >= a.x &&
+            x <= b.x
+        ) {
 
-
-    index =
-        Math.max(
-            0,
-            Math.min(
-                terrain.length - 2,
-                index
-            )
-        );
-
-
-    const a =
-        terrain[index];
-
-
-    const b =
-        terrain[index + 1];
-
-
-    if (
-        !a ||
-        !b
-    ) {
-
-        return terrain[
-            terrain.length - 1
-        ].y;
-
-    }
-
-
-    const t =
-        Math.max(
-            0,
-            Math.min(
-                1,
+            const t =
                 (x - a.x) /
-                (b.x - a.x)
-            )
-        );
+                (b.x - a.x);
 
 
-    return (
-        a.y +
-        (b.y - a.y) *
-        t
-    );
+            return (
+                a.y +
+                (b.y - a.y) * t
+            );
+
+        }
+
+    }
+
+
+    return terrain[
+        terrain.length - 1
+    ].y;
 
 }
 
 
 function getGroundAngle(x) {
 
-    const delta =
-        8;
-
-
-    const y1 =
-        getGroundY(
-            x - delta
-        );
-
-
-    const y2 =
-        getGroundY(
-            x + delta
-        );
-
+    const d = 5;
 
     return Math.atan2(
-        y2 - y1,
-        delta * 2
+        getGroundY(x + d) -
+        getGroundY(x - d),
+        d * 2
     );
 
 }
 
 
-/* =========================================================
-   ITEMS
-========================================================= */
+/* ================= ITEMS ================= */
 
 function generateItems() {
 
-    coinItems = [];
-
+    coins = [];
     fuelItems = [];
-
     obstacles = [];
 
 
     for (
         let x = 650;
-        x < 28000;
+        x < 33000;
         x +=
             350 +
-            Math.random() *
-            450
+            Math.random() * 500
     ) {
 
-        const coinX =
-            x +
-            Math.random() *
-            120;
+        coins.push({
 
-
-        coinItems.push({
-
-            x: coinX,
+            x:
+                x +
+                Math.random() * 150,
 
             y:
-                getGroundY(
-                    coinX
-                ) - 65,
+                getGroundY(x) - 65,
 
             radius: 13,
 
             collected: false,
 
             rotation:
-                Math.random() *
-                Math.PI *
-                2
+                Math.random() * 6
 
         });
 
@@ -2617,28 +942,21 @@ function generateItems() {
 
 
     for (
-        let x = 1300;
-        x < 28000;
+        let x = 1200;
+        x < 33000;
         x +=
-            1000 +
-            Math.random() *
-            700
+            900 +
+            Math.random() * 800
     ) {
-
-        const fuelX =
-            x +
-            Math.random() *
-            200;
-
 
         fuelItems.push({
 
-            x: fuelX,
+            x:
+                x +
+                Math.random() * 250,
 
             y:
-                getGroundY(
-                    fuelX
-                ) - 58,
+                getGroundY(x) - 58,
 
             radius: 16,
 
@@ -2650,38 +968,29 @@ function generateItems() {
 
 
     for (
-        let x = 950;
-        x < 28000;
+        let x = 900;
+        x < 33000;
         x +=
-            650 +
-            Math.random() *
-            700
+            600 +
+            Math.random() * 850
     ) {
-
-        const obstacleX =
-            x +
-            Math.random() *
-            180;
-
 
         obstacles.push({
 
-            x: obstacleX,
+            x:
+                x +
+                Math.random() * 250,
 
             y:
-                getGroundY(
-                    obstacleX
-                ),
+                getGroundY(x) - 18,
 
             width:
                 25 +
-                Math.random() *
-                22,
+                Math.random() * 22,
 
             height:
                 20 +
-                Math.random() *
-                18,
+                Math.random() * 18,
 
             hit: false
 
@@ -2692,214 +1001,117 @@ function generateItems() {
 }
 
 
-/* =========================================================
-   START GAME
-========================================================= */
+/* ================= START ================= */
 
-startBtn.addEventListener(
-    "click",
-    startGame
-);
+startBtn.onclick =
+    startGame;
 
 
 function startGame() {
 
     initAudio();
 
+    currentLevel =
+        Math.max(
+            1,
+            highestLevel
+        );
+
+
+    distance = 0;
+    runCoins = 0;
+
+    checkpoints = 0;
+
+    nextCheckpoint =
+        500;
+
+    fuel =
+        100 +
+        (upgrades.fuel - 1) * 20;
+
+    lives = 3;
+
+    speed = 0;
+
+    carX = 220;
+
+    carVelocityY = 0;
+
+    cameraX = 0;
 
     generateTerrain();
+
+    carY =
+        getGroundY(carX) - 45;
+
+    carAngle =
+        getGroundAngle(carX);
 
     generateItems();
 
 
-    distance =
-        0;
-
-    runCoins =
-        0;
-
-    runFuelCollected =
-        0;
-
-
-    const maxFuel =
-        100 +
-        (
-            upgrades.fuel - 1
-        ) *
-        20;
-
-
-    fuel =
-        maxFuel;
-
-
-    lives =
-        3;
-
-
-    speed =
-        0;
-
-
-    carVelocityY =
-        0;
-
-
-    carX =
-        220;
-
-
-    cameraX =
-        0;
-
-
-    carY =
-        getGroundY(
-            carX
-        ) -
-        vehicles[
-            selectedVehicle
-        ].height;
-
-
-    carAngle =
-        getGroundAngle(
-            carX
-        );
-
-
-    gasPressed =
-        false;
-
-
-    brakePressed =
-        false;
-
-
-    paused =
-        false;
-
-
-    gameOver =
-        false;
-
-
-    countdownRunning =
-        false;
-
-
-    running =
-        true;
-
-
-    localStorage.setItem(
-        "phd_hasPlayed",
-        "1"
-    );
+    running = true;
+    paused = false;
+    gameOver = false;
 
 
     menu.style.display =
         "none";
 
-
     hud.style.display =
         "flex";
-
 
     controls.style.display =
         "flex";
 
-
-    pauseScreen.style.display =
+    levelComplete.style.display =
         "none";
 
 
-    countdownEl.style.display =
-        "none";
-
-
-    distanceEl.textContent =
-        "0";
-
-
-    coinsEl.textContent =
-        "0";
-
-
-    fuelEl.textContent =
-        "100";
-
-
-    livesEl.textContent =
-        "3";
-
-
-    checkAchievements();
-
+    updateHUD();
 
     startCountdown();
 
 }
 
 
-/* =========================================================
-   COUNTDOWN
-========================================================= */
+/* ================= COUNTDOWN ================= */
 
 function startCountdown() {
 
-    countdownRunning =
-        true;
-
+    countdownRunning = true;
 
     countdownEl.style.display =
         "flex";
 
 
-    const numbers = [
+    const values =
+        ["3","2","1","GO!"];
 
-        "3",
-
-        "2",
-
-        "1",
-
-        "GO!"
-
-    ];
-
-
-    let index =
-        0;
+    let index = 0;
 
 
     function next() {
 
         if (!running) {
-
-            countdownRunning =
-                false;
-
             countdownEl.style.display =
                 "none";
-
+            countdownRunning = false;
             return;
-
         }
 
 
         countdownEl.textContent =
-            numbers[index];
+            values[index];
 
 
         playTone(
             index === 3
                 ? 900
                 : 500,
-            0.1,
-            "square",
-            0.05
+            .1,
+            "square"
         );
 
 
@@ -2907,28 +1119,22 @@ function startCountdown() {
 
 
         if (
-            index >=
-            numbers.length
+            index >= values.length
         ) {
 
-            setTimeout(
-                function () {
+            setTimeout(() => {
 
-                    countdownEl.style.display =
-                        "none";
+                countdownEl.style.display =
+                    "none";
 
-                    countdownRunning =
-                        false;
+                countdownRunning =
+                    false;
 
-                    startEngineSound();
+                startEngineSound();
 
-                },
-                550
-            );
-
+            },500);
 
             return;
-
         }
 
 
@@ -2945,45 +1151,35 @@ function startCountdown() {
 }
 
 
-/* =========================================================
-   INPUT
-========================================================= */
+/* ================= INPUT ================= */
 
 window.addEventListener(
     "keydown",
-    function (e) {
+    e => {
 
         if (
-            e.code ===
-            "ArrowRight" ||
-            e.code ===
-            "KeyD"
+            e.code === "ArrowRight" ||
+            e.code === "KeyD"
         ) {
 
-            gasPressed =
-                true;
+            gasPressed = true;
 
         }
 
 
         if (
-            e.code ===
-            "ArrowLeft" ||
-            e.code ===
-            "KeyA"
+            e.code === "ArrowLeft" ||
+            e.code === "KeyA"
         ) {
 
-            brakePressed =
-                true;
+            brakePressed = true;
 
         }
 
 
         if (
-            e.code ===
-            "KeyP" ||
-            e.code ===
-            "Escape"
+            e.code === "KeyP" ||
+            e.code === "Escape"
         ) {
 
             togglePause();
@@ -2996,30 +1192,24 @@ window.addEventListener(
 
 window.addEventListener(
     "keyup",
-    function (e) {
+    e => {
 
         if (
-            e.code ===
-            "ArrowRight" ||
-            e.code ===
-            "KeyD"
+            e.code === "ArrowRight" ||
+            e.code === "KeyD"
         ) {
 
-            gasPressed =
-                false;
+            gasPressed = false;
 
         }
 
 
         if (
-            e.code ===
-            "ArrowLeft" ||
-            e.code ===
-            "KeyA"
+            e.code === "ArrowLeft" ||
+            e.code === "KeyA"
         ) {
 
-            brakePressed =
-                false;
+            brakePressed = false;
 
         }
 
@@ -3027,59 +1217,46 @@ window.addEventListener(
 );
 
 
-/* =========================================================
-   MOBILE CONTROLS
-========================================================= */
+/* ================= MOBILE ================= */
 
 function setupHoldButton(
     button,
-    setter
+    callback
 ) {
-
-    if (!button) {
-        return;
-    }
-
-
-    function start(e) {
-
-        e.preventDefault();
-
-        setter(true);
-
-    }
-
-
-    function end(e) {
-
-        e.preventDefault();
-
-        setter(false);
-
-    }
-
 
     button.addEventListener(
         "pointerdown",
-        start
+        e => {
+
+            e.preventDefault();
+
+            callback(true);
+
+        }
     );
 
 
     button.addEventListener(
         "pointerup",
-        end
+        e => {
+
+            e.preventDefault();
+
+            callback(false);
+
+        }
     );
 
 
     button.addEventListener(
         "pointercancel",
-        end
+        () => callback(false)
     );
 
 
     button.addEventListener(
         "pointerleave",
-        end
+        () => callback(false)
     );
 
 }
@@ -3087,97 +1264,66 @@ function setupHoldButton(
 
 setupHoldButton(
     gasBtn,
-    function (value) {
-
-        gasPressed =
-            value;
-
+    value => {
+        gasPressed = value;
     }
 );
 
 
 setupHoldButton(
     brakeBtn,
-    function (value) {
-
-        brakePressed =
-            value;
-
+    value => {
+        brakePressed = value;
     }
 );
 
 
-/* =========================================================
-   PAUSE
-========================================================= */
+/* ================= PAUSE ================= */
 
-pauseBtn.addEventListener(
-    "click",
-    togglePause
-);
+pauseBtn.onclick =
+    togglePause;
 
 
-resumeBtn.addEventListener(
-    "click",
-    function () {
+resumeBtn.onclick =
+    () => {
 
-        paused =
-            false;
-
+        paused = false;
 
         pauseScreen.style.display =
             "none";
-
 
         startEngineSound();
 
-    }
-);
+    };
 
 
-quitBtn.addEventListener(
-    "click",
-    function () {
+quitBtn.onclick =
+    () => {
 
-        running =
-            false;
+        running = false;
 
+        paused = false;
 
-        paused =
-            false;
-
-
-        gasPressed =
-            false;
-
-
-        brakePressed =
-            false;
-
+        gasPressed = false;
+        brakePressed = false;
 
         stopEngineSound();
 
-
         pauseScreen.style.display =
             "none";
-
 
         hud.style.display =
             "none";
 
-
         controls.style.display =
             "none";
-
 
         menu.style.display =
             "flex";
 
+        updateMenu();
 
-        updateMenuStats();
-
-    }
-);
+    };
 
 
 function togglePause() {
@@ -3187,9 +1333,7 @@ function togglePause() {
         gameOver ||
         countdownRunning
     ) {
-
         return;
-
     }
 
 
@@ -3197,61 +1341,45 @@ function togglePause() {
         !paused;
 
 
+    pauseScreen.style.display =
+        paused
+            ? "flex"
+            : "none";
+
+
     if (paused) {
-
-        pauseScreen.style.display =
-            "flex";
-
-
         stopEngineSound();
-
     } else {
-
-        pauseScreen.style.display =
-            "none";
-
-
         startEngineSound();
-
     }
 
 }
 
 
-/* =========================================================
-   PHYSICS
-========================================================= */
+/* ================= PHYSICS ================= */
 
 function updatePhysics(dt) {
 
     const vehicle =
-        vehicles[
-            selectedVehicle
-        ];
+        vehicles[selectedVehicle];
 
 
     const enginePower =
         1 +
-        (
-            upgrades.engine - 1
-        ) *
-        0.16;
+        (upgrades.engine - 1)
+        * .16;
 
 
     const speedPower =
         1 +
-        (
-            upgrades.speed - 1
-        ) *
-        0.13;
+        (upgrades.speed - 1)
+        * .13;
 
 
-    const tireGrip =
+    const grip =
         vehicle.grip +
-        (
-            upgrades.tire - 1
-        ) *
-        0.012;
+        (upgrades.tire - 1)
+        * .012;
 
 
     const maxSpeed =
@@ -3270,28 +1398,23 @@ function updatePhysics(dt) {
     ) {
 
         speed +=
-            acceleration *
-            dt;
-
-
-        const efficiency =
-            1 -
-            (
-                upgrades.fuel - 1
-            ) *
-            0.025;
+            acceleration * dt;
 
 
         fuel -=
             vehicle.fuelUsage *
             dt *
-            efficiency;
+            (
+                1 -
+                (upgrades.fuel - 1)
+                * .025
+            );
 
     } else {
 
         speed *=
             Math.pow(
-                0.985,
+                .985,
                 dt
             );
 
@@ -3301,8 +1424,7 @@ function updatePhysics(dt) {
     if (brakePressed) {
 
         speed -=
-            0.32 *
-            dt;
+            .32 * dt;
 
     }
 
@@ -3318,13 +1440,11 @@ function updatePhysics(dt) {
 
 
     carVelocityY +=
-        0.45 *
-        dt;
+        .45 * dt;
 
 
     carY +=
-        carVelocityY *
-        dt;
+        carVelocityY * dt;
 
 
     carX +=
@@ -3333,45 +1453,28 @@ function updatePhysics(dt) {
         2.2;
 
 
-    if (
-        carX < 100
-    ) {
-
-        carX =
-            100;
-
-    }
-
-
-    const groundY =
-        getGroundY(
-            carX
-        );
+    const ground =
+        getGroundY(carX);
 
 
     const targetY =
-        groundY -
+        ground -
         vehicle.height;
 
 
     if (
-        carY >=
-        targetY
+        carY >= targetY
     ) {
 
-        carY =
-            targetY;
+        carY = targetY;
 
-        carVelocityY =
-            0;
+        carVelocityY = 0;
 
     }
 
 
     const targetAngle =
-        getGroundAngle(
-            carX
-        );
+        getGroundAngle(carX);
 
 
     carAngle +=
@@ -3379,25 +1482,21 @@ function updatePhysics(dt) {
             targetAngle -
             carAngle
         ) *
-        Math.min(
-            1,
-            tireGrip *
-            dt *
-            3
-        );
+        grip *
+        dt *
+        3;
 
 
     const targetCamera =
         carX -
-        W * 0.30;
+        W * .30;
 
 
     cameraX +=
         (
             targetCamera -
             cameraX
-        ) *
-        0.08;
+        ) * .08;
 
 
     cameraX =
@@ -3423,79 +1522,21 @@ function updatePhysics(dt) {
         );
 
 
-    const maxFuel =
-        100 +
-        (
-            upgrades.fuel - 1
-        ) *
-        20;
-
-
-    distanceEl.textContent =
-        distance;
-
-
-    coinsEl.textContent =
-        runCoins;
-
-
-    fuelEl.textContent =
-        Math.round(
-            (
-                fuel /
-                maxFuel
-            ) *
-            100
-        );
-
-
-    livesEl.textContent =
-        lives;
-
-
     checkItems();
 
     checkObstacles();
 
+    checkCheckpoint();
 
-    /* UPDATE MISSION PROGRESS */
-
-    missionData.distance =
-        Math.max(
-            missionData.distance,
-            distance
-        );
-
-
-    missionData.survivor =
-        Math.max(
-            missionData.survivor,
-            distance
-        );
-
-
-    saveMissions();
-
-
-    checkMissions();
+    updateHUD();
 
 
     if (
-        fuel <= 0
+        fuel <= 0 &&
+        Math.abs(speed) < .04
     ) {
 
-        speed *=
-            0.97;
-
-
-        if (
-            Math.abs(speed) <
-            0.04
-        ) {
-
-            endGame();
-
-        }
+        endGame();
 
     }
 
@@ -3505,30 +1546,184 @@ function updatePhysics(dt) {
 }
 
 
-/* =========================================================
-   ITEMS
-========================================================= */
+/* ================= CHECKPOINT ================= */
+
+function checkCheckpoint() {
+
+    if (
+        distance < nextCheckpoint
+    ) {
+        return;
+    }
+
+
+    checkpoints++;
+
+
+    totalCoins +=
+        checkpointBonus;
+
+
+    runCoins +=
+        checkpointBonus;
+
+
+    localStorage.setItem(
+        "phd_totalCoins",
+        totalCoins
+    );
+
+
+    playTone(
+        700,
+        .12,
+        "triangle"
+    );
+
+
+    setTimeout(
+        () =>
+            playTone(
+                1000,
+                .15,
+                "triangle"
+            ),
+        100
+    );
+
+
+    if (
+        checkpoints >= 3
+    ) {
+
+        completeLevel();
+
+        return;
+
+    }
+
+
+    nextCheckpoint += 500;
+
+}
+
+
+/* ================= LEVEL COMPLETE ================= */
+
+function completeLevel() {
+
+    running = false;
+
+    stopEngineSound();
+
+    currentLevel++;
+
+    highestLevel =
+        Math.max(
+            highestLevel,
+            currentLevel
+        );
+
+
+    localStorage.setItem(
+        "phd_highestLevel",
+        highestLevel
+    );
+
+
+    checkpointMessage.textContent =
+        `Level ${currentLevel - 1} completed!`;
+
+
+    levelComplete.style.display =
+        "flex";
+
+
+    updateMenu();
+
+
+}
+
+
+continueBtn.onclick =
+    () => {
+
+        levelComplete.style.display =
+            "none";
+
+        startNextLevel();
+
+    };
+
+
+function startNextLevel() {
+
+    distance = 0;
+
+    runCoins = 0;
+
+    checkpoints = 0;
+
+    nextCheckpoint = 500;
+
+    fuel =
+        100 +
+        (upgrades.fuel - 1) * 20;
+
+    lives = 3;
+
+    speed = 0;
+
+    carX = 220;
+
+    carVelocityY = 0;
+
+    cameraX = 0;
+
+    generateTerrain();
+
+    carY =
+        getGroundY(carX) - 45;
+
+    carAngle =
+        getGroundAngle(carX);
+
+    generateItems();
+
+    running = true;
+
+    gameOver = false;
+
+    hud.style.display =
+        "flex";
+
+    controls.style.display =
+        "flex";
+
+    updateHUD();
+
+    startCountdown();
+
+}
+
+
+/* ================= ITEMS ================= */
 
 function checkItems() {
 
-    coinItems.forEach(
-        function (coin) {
+    coins.forEach(
+        coin => {
 
-            if (
-                coin.collected
-            ) {
+            if (coin.collected) {
                 return;
             }
 
 
             const dx =
-                carX -
-                coin.x;
-
+                carX - coin.x;
 
             const dy =
-                carY -
-                coin.y;
+                carY - coin.y;
 
 
             const d =
@@ -3538,20 +1733,13 @@ function checkItems() {
                 );
 
 
-            if (
-                d < 55
-            ) {
+            if (d < 50) {
 
-                coin.collected =
-                    true;
-
+                coin.collected = true;
 
                 runCoins++;
 
                 totalCoins++;
-
-
-                missionData.coins++;
 
 
                 localStorage.setItem(
@@ -3560,43 +1748,11 @@ function checkItems() {
                 );
 
 
-                saveMissions();
-
-
-                menuCoins.textContent =
-                    totalCoins;
-
-
-                coinsEl.textContent =
-                    runCoins;
-
-
                 playTone(
                     900,
-                    0.07,
-                    "triangle",
-                    0.06
+                    .07,
+                    "triangle"
                 );
-
-
-                setTimeout(
-                    function () {
-
-                        playTone(
-                            1300,
-                            0.08,
-                            "triangle",
-                            0.05
-                        );
-
-                    },
-                    60
-                );
-
-
-                checkMissions();
-
-                checkAchievements();
 
             }
 
@@ -3605,23 +1761,18 @@ function checkItems() {
 
 
     fuelItems.forEach(
-        function (item) {
+        item => {
 
-            if (
-                item.collected
-            ) {
+            if (item.collected) {
                 return;
             }
 
 
             const dx =
-                carX -
-                item.x;
-
+                carX - item.x;
 
             const dy =
-                carY -
-                item.y;
+                carY - item.y;
 
 
             const d =
@@ -3631,47 +1782,25 @@ function checkItems() {
                 );
 
 
-            if (
-                d < 55
-            ) {
+            if (d < 55) {
 
-                item.collected =
-                    true;
-
-
-                runFuelCollected++;
-
-
-                missionData.fuel++;
-
-
-                const maxFuel =
-                    100 +
-                    (
-                        upgrades.fuel - 1
-                    ) *
-                    20;
+                item.collected = true;
 
 
                 fuel =
                     Math.min(
-                        maxFuel,
+                        100 +
+                        (upgrades.fuel - 1)
+                        * 20,
+
                         fuel + 35
                     );
 
 
-                saveMissions();
-
-
                 playTone(
                     600,
-                    0.1,
-                    "sine",
-                    0.05
+                    .1
                 );
-
-
-                checkMissions();
 
             }
 
@@ -3681,24 +1810,18 @@ function checkItems() {
 }
 
 
-/* =========================================================
-   OBSTACLES
-========================================================= */
+/* ================= OBSTACLES ================= */
 
 function checkObstacles() {
 
     const vehicle =
-        vehicles[
-            selectedVehicle
-        ];
+        vehicles[selectedVehicle];
 
 
     obstacles.forEach(
-        function (obstacle) {
+        obstacle => {
 
-            if (
-                obstacle.hit
-            ) {
+            if (obstacle.hit) {
                 return;
             }
 
@@ -3719,21 +1842,15 @@ function checkObstacles() {
 
             if (
                 dx <
-                vehicle.width *
-                0.45 +
-                obstacle.width *
-                0.45
+                vehicle.width * .45 +
+                obstacle.width * .45
                 &&
                 dy <
-                vehicle.height *
-                0.6 +
-                obstacle.height *
-                0.6
+                vehicle.height * .55 +
+                obstacle.height * .55
             ) {
 
-                obstacle.hit =
-                    true;
-
+                obstacle.hit = true;
 
                 crash();
 
@@ -3745,43 +1862,28 @@ function checkObstacles() {
 }
 
 
-/* =========================================================
-   CRASH
-========================================================= */
-
 function crash() {
 
-    if (!running) {
-        return;
-    }
-
-
     lives--;
+
+    speed *= .3;
+
+    carVelocityY = -6;
 
 
     playTone(
         100,
-        0.18,
+        .18,
         "sawtooth",
-        0.08
+        .08
     );
 
 
-    speed *=
-        0.3;
-
-
-    carVelocityY =
-        -6;
-
-
-    if (
-        lives <= 0
-    ) {
+    if (lives <= 0) {
 
         setTimeout(
             endGame,
-            500
+            400
         );
 
     }
@@ -3789,9 +1891,42 @@ function crash() {
 }
 
 
-/* =========================================================
-   GAME OVER
-========================================================= */
+/* ================= HUD ================= */
+
+function updateHUD() {
+
+    distanceEl.textContent =
+        distance;
+
+    coinsEl.textContent =
+        runCoins;
+
+    const maxFuel =
+        100 +
+        (upgrades.fuel - 1) * 20;
+
+
+    fuelEl.textContent =
+        Math.round(
+            fuel /
+            maxFuel *
+            100
+        );
+
+
+    livesEl.textContent =
+        lives;
+
+    currentLevelEl.textContent =
+        currentLevel;
+
+    checkpointEl.textContent =
+        checkpoints;
+
+}
+
+
+/* ================= END GAME ================= */
 
 function endGame() {
 
@@ -3800,21 +1935,13 @@ function endGame() {
     }
 
 
-    gameOver =
-        true;
+    gameOver = true;
 
+    running = false;
 
-    running =
-        false;
+    gasPressed = false;
 
-
-    gasPressed =
-        false;
-
-
-    brakePressed =
-        false;
-
+    brakePressed = false;
 
     stopEngineSound();
 
@@ -3827,35 +1954,12 @@ function endGame() {
         bestDistance =
             distance;
 
-
         localStorage.setItem(
             "phd_bestDistance",
             bestDistance
         );
 
     }
-
-
-    missionData.distance =
-        Math.max(
-            missionData.distance,
-            distance
-        );
-
-
-    missionData.survivor =
-        Math.max(
-            missionData.survivor,
-            distance
-        );
-
-
-    saveMissions();
-
-
-    checkMissions();
-
-    checkAchievements();
 
 
     localStorage.setItem(
@@ -3866,29 +1970,19 @@ function endGame() {
 
     setTimeout(
         showGameOver,
-        400
+        500
     );
 
 }
 
-
-/* =========================================================
-   GAME OVER SCREEN
-========================================================= */
 
 function showGameOver() {
 
     hud.style.display =
         "none";
 
-
     controls.style.display =
         "none";
-
-
-    countdownEl.style.display =
-        "none";
-
 
     pauseScreen.style.display =
         "none";
@@ -3904,11 +1998,6 @@ function showGameOver() {
         );
 
 
-    if (!card) {
-        return;
-    }
-
-
     card.innerHTML = `
 
         <div class="game-icon">
@@ -3920,62 +2009,68 @@ function showGameOver() {
         </h1>
 
         <h2>
-            PRIYANSHU HILL DRIVE
+            LEVEL ${currentLevel}
         </h2>
 
         <div class="top-stats">
 
             <div class="stat-box">
-                📏 Distance
+                📏 DISTANCE
                 <strong>
                     ${distance} m
                 </strong>
             </div>
 
             <div class="stat-box">
-                🪙 Run Coins
+                🪙 RUN COINS
                 <strong>
                     ${runCoins}
                 </strong>
             </div>
 
+            <div class="stat-box">
+                🗺️ LEVEL
+                <strong>
+                    ${currentLevel}
+                </strong>
+            </div>
+
         </div>
 
-        <div
-            style="
-                margin-top:15px;
-                padding:12px;
-                border-radius:12px;
-                background:rgba(255,255,255,0.08);
-                color:white;
-            "
-        >
-            🏆 Best Distance:
-            <strong>
-                ${bestDistance} m
-            </strong>
+
+        <div class="level-box">
+
+            <div>
+                🏆 BEST
+                <strong>
+                    ${bestDistance} m
+                </strong>
+            </div>
+
+            <div>
+                🪙 TOTAL
+                <strong>
+                    ${totalCoins}
+                </strong>
+            </div>
+
         </div>
 
-        <div
-            style="
-                margin-top:12px;
-                color:#ffd54f;
-                font-weight:900;
-            "
-        >
-            🪙 Total Coins:
-            ${totalCoins}
-        </div>
 
         <button
             id="restartBtn"
             style="
                 width:100%;
                 padding:15px;
-                margin-top:20px;
+                margin-top:18px;
                 border:none;
-                border-radius:15px;
-                background:linear-gradient(135deg,#00c853,#64dd17);
+                border-radius:14px;
+                background:
+                linear-gradient(
+                    135deg,
+                    #00c853,
+                    #64dd17
+                );
                 color:white;
                 font-size:18px;
                 font-weight:900;
@@ -3985,18 +2080,20 @@ function showGameOver() {
             🔄 PLAY AGAIN
         </button>
 
+
         <button
             id="menuBtn"
             style="
                 width:100%;
                 padding:13px;
-                margin-top:10px;
+                margin-top:9px;
                 border:none;
-                border-radius:15px;
-                background:rgba(255,255,255,0.12);
+                border-radius:14px;
+                background:
+                rgba(255,255,255,.12);
                 color:white;
                 font-size:15px;
-                font-weight:800;
+                font-weight:900;
                 cursor:pointer;
             "
         >
@@ -4006,39 +2103,59 @@ function showGameOver() {
     `;
 
 
-    document
-        .getElementById(
-            "restartBtn"
-        )
-        .addEventListener(
-            "click",
-            function () {
+    document.getElementById(
+        "restartBtn"
+    ).onclick =
+        () => {
 
-                location.reload();
+            location.reload();
 
-            }
-        );
+        };
 
 
-    document
-        .getElementById(
-            "menuBtn"
-        )
-        .addEventListener(
-            "click",
-            function () {
+    document.getElementById(
+        "menuBtn"
+    ).onclick =
+        () => {
 
-                location.reload();
+            location.reload();
 
-            }
-        );
+        };
 
 }
 
 
-/* =========================================================
-   SKY
-========================================================= */
+/* ================= MENU UPDATE ================= */
+
+function updateMenu() {
+
+    menuCoins.textContent =
+        totalCoins;
+
+    menuBestScore.textContent =
+        bestDistance;
+
+    menuLevel.textContent =
+        highestLevel;
+
+    levelText.textContent =
+        "LEVEL " +
+        highestLevel;
+
+    menuCheckpoint.textContent =
+        "0 / 3";
+
+    updateGarageUI();
+
+    updateVehicleUI();
+
+}
+
+
+updateMenu();
+
+
+/* ================= DRAW SKY ================= */
 
 function drawSky() {
 
@@ -4056,12 +2173,10 @@ function drawSky() {
         "#42a5f5"
     );
 
-
     gradient.addColorStop(
-        0.55,
+        .55,
         "#81d4fa"
     );
-
 
     gradient.addColorStop(
         1,
@@ -4071,7 +2186,6 @@ function drawSky() {
 
     ctx.fillStyle =
         gradient;
-
 
     ctx.fillRect(
         0,
@@ -4085,46 +2199,41 @@ function drawSky() {
 
     ctx.beginPath();
 
-
     ctx.arc(
-        W * 0.82,
-        H * 0.16,
+        W * .82,
+        H * .16,
         48,
         0,
         Math.PI * 2
     );
 
-
     ctx.fillStyle =
         "#fff176";
-
 
     ctx.fill();
 
 
-    /* CLOUDS */
-
     drawCloud(
-        W * 0.15 -
-        cameraX * 0.06,
-        H * 0.17,
+        W * .18 -
+        cameraX * .08,
+        H * .18,
         1
     );
 
 
     drawCloud(
-        W * 0.55 -
-        cameraX * 0.04,
-        H * 0.24,
-        0.8
+        W * .58 -
+        cameraX * .05,
+        H * .25,
+        .8
     );
 
 
     drawCloud(
-        W * 0.90 -
-        cameraX * 0.03,
-        H * 0.13,
-        0.7
+        W * .90 -
+        cameraX * .04,
+        H * .12,
+        .7
     );
 
 }
@@ -4138,25 +2247,21 @@ function drawCloud(
 
     ctx.save();
 
-
     ctx.translate(
         x,
         y
     );
-
 
     ctx.scale(
         scale,
         scale
     );
 
-
     ctx.fillStyle =
-        "rgba(255,255,255,0.75)";
+        "rgba(255,255,255,.72)";
 
 
     ctx.beginPath();
-
 
     ctx.arc(
         0,
@@ -4165,7 +2270,6 @@ function drawCloud(
         0,
         Math.PI * 2
     );
-
 
     ctx.arc(
         25,
@@ -4175,7 +2279,6 @@ function drawCloud(
         Math.PI * 2
     );
 
-
     ctx.arc(
         55,
         10,
@@ -4184,7 +2287,6 @@ function drawCloud(
         Math.PI * 2
     );
 
-
     ctx.fillRect(
         0,
         10,
@@ -4192,58 +2294,46 @@ function drawCloud(
         20
     );
 
-
     ctx.fill();
-
 
     ctx.restore();
 
 }
 
 
-/* =========================================================
-   MOUNTAINS
-========================================================= */
+/* ================= MOUNTAINS ================= */
 
 function drawMountains() {
 
     ctx.save();
 
-
     ctx.translate(
-        -cameraX * 0.12,
+        -cameraX * .12,
         0
     );
-
 
     ctx.fillStyle =
         "#78909c";
 
-
     ctx.beginPath();
-
 
     ctx.moveTo(
         -500,
-        H * 0.65
+        H * .62
     );
 
 
     for (
         let x = -500;
-        x <
-        W +
-        cameraX +
-        1000;
+        x < W + cameraX + 1000;
         x += 180
     ) {
 
         const peak =
-            H * 0.37 +
+            H * .35 +
             Math.sin(
-                x * 0.01
-            ) *
-            55;
+                x * .01
+            ) * 55;
 
 
         ctx.lineTo(
@@ -4251,55 +2341,43 @@ function drawMountains() {
             peak
         );
 
-
         ctx.lineTo(
             x + 90,
-            H * 0.65
+            H * .62
         );
 
     }
 
 
     ctx.lineTo(
-        W +
-        cameraX +
-        1000,
+        W + cameraX + 1000,
         H
     );
-
 
     ctx.lineTo(
         -500,
         H
     );
 
-
     ctx.closePath();
 
-
     ctx.fill();
-
 
     ctx.restore();
 
 }
 
 
-/* =========================================================
-   TERRAIN DRAW
-========================================================= */
+/* ================= TERRAIN ================= */
 
 function drawTerrain() {
 
-    if (
-        !terrain.length
-    ) {
+    if (!terrain.length) {
         return;
     }
 
 
     ctx.save();
-
 
     ctx.translate(
         -cameraX,
@@ -4309,25 +2387,22 @@ function drawTerrain() {
 
     ctx.beginPath();
 
-
     ctx.moveTo(
         terrain[0].x,
         terrain[0].y
     );
 
 
-    for (
-        let i = 1;
-        i < terrain.length;
-        i++
-    ) {
+    terrain.forEach(
+        point => {
 
-        ctx.lineTo(
-            terrain[i].x,
-            terrain[i].y
-        );
+            ctx.lineTo(
+                point.x,
+                point.y
+            );
 
-    }
+        }
+    );
 
 
     ctx.lineTo(
@@ -4347,36 +2422,33 @@ function drawTerrain() {
     ctx.closePath();
 
 
-    const groundGradient =
+    const gradient =
         ctx.createLinearGradient(
             0,
-            H * 0.45,
+            H * .45,
             0,
             H
         );
 
 
-    groundGradient.addColorStop(
+    gradient.addColorStop(
         0,
         "#4caf50"
     );
 
-
-    groundGradient.addColorStop(
-        0.12,
+    gradient.addColorStop(
+        .12,
         "#795548"
     );
 
-
-    groundGradient.addColorStop(
+    gradient.addColorStop(
         1,
         "#4e342e"
     );
 
 
     ctx.fillStyle =
-        groundGradient;
-
+        gradient;
 
     ctx.fill();
 
@@ -4384,54 +2456,46 @@ function drawTerrain() {
     ctx.beginPath();
 
 
-    ctx.moveTo(
-        terrain[0].x,
-        terrain[0].y
+    terrain.forEach(
+        (point,i) => {
+
+            if (i === 0) {
+
+                ctx.moveTo(
+                    point.x,
+                    point.y
+                );
+
+            } else {
+
+                ctx.lineTo(
+                    point.x,
+                    point.y
+                );
+
+            }
+
+        }
     );
-
-
-    for (
-        let i = 1;
-        i < terrain.length;
-        i++
-    ) {
-
-        ctx.lineTo(
-            terrain[i].x,
-            terrain[i].y
-        );
-
-    }
 
 
     ctx.strokeStyle =
         "#2e7d32";
 
-
-    ctx.lineWidth =
-        8;
-
-
-    ctx.lineJoin =
-        "round";
-
+    ctx.lineWidth = 8;
 
     ctx.stroke();
-
 
     ctx.restore();
 
 }
 
 
-/* =========================================================
-   COINS DRAW
-========================================================= */
+/* ================= CHECKPOINT MARKERS ================= */
 
-function drawCoins() {
+function drawCheckpointMarkers() {
 
     ctx.save();
-
 
     ctx.translate(
         -cameraX,
@@ -4439,22 +2503,120 @@ function drawCoins() {
     );
 
 
-    coinItems.forEach(
-        function (coin) {
+    for (
+        let i = 1;
+        i <= 3;
+        i++
+    ) {
 
-            if (
-                coin.collected
-            ) {
+        const x =
+            i * 500;
+
+
+        if (
+            x < cameraX - 100 ||
+            x > cameraX + W + 100
+        ) {
+            continue;
+        }
+
+
+        const y =
+            getGroundY(x);
+
+
+        ctx.strokeStyle =
+            "#ffffff";
+
+        ctx.lineWidth = 4;
+
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            x,
+            y
+        );
+
+        ctx.lineTo(
+            x,
+            y - 100
+        );
+
+        ctx.stroke();
+
+
+        ctx.fillStyle =
+            "#ff1744";
+
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            x,
+            y - 100
+        );
+
+        ctx.lineTo(
+            x + 55,
+            y - 82
+        );
+
+        ctx.lineTo(
+            x,
+            y - 65
+        );
+
+        ctx.closePath();
+
+        ctx.fill();
+
+
+        ctx.fillStyle =
+            "white";
+
+        ctx.font =
+            "bold 12px Arial";
+
+        ctx.fillText(
+            "CP " + i,
+            x + 5,
+            y - 110
+        );
+
+    }
+
+
+    ctx.restore();
+
+}
+
+
+/* ================= COINS ================= */
+
+function drawCoins() {
+
+    ctx.save();
+
+    ctx.translate(
+        -cameraX,
+        0
+    );
+
+
+    coins.forEach(
+        coin => {
+
+            if (coin.collected) {
                 return;
             }
 
 
             coin.rotation +=
-                0.04;
+                .04;
 
 
             ctx.save();
-
 
             ctx.translate(
                 coin.x,
@@ -4462,25 +2624,20 @@ function drawCoins() {
             );
 
 
-            const scale =
-                Math.abs(
-                    Math.cos(
-                        coin.rotation
-                    )
-                );
-
-
             ctx.scale(
                 Math.max(
-                    0.25,
-                    scale
+                    .25,
+                    Math.abs(
+                        Math.cos(
+                            coin.rotation
+                        )
+                    )
                 ),
                 1
             );
 
 
             ctx.beginPath();
-
 
             ctx.arc(
                 0,
@@ -4494,17 +2651,13 @@ function drawCoins() {
             ctx.fillStyle =
                 "#ffd600";
 
-
             ctx.fill();
 
 
             ctx.strokeStyle =
                 "#ff8f00";
 
-
-            ctx.lineWidth =
-                3;
-
+            ctx.lineWidth = 3;
 
             ctx.stroke();
 
@@ -4512,18 +2665,14 @@ function drawCoins() {
             ctx.fillStyle =
                 "#fff8e1";
 
-
             ctx.font =
                 "bold 12px Arial";
-
 
             ctx.textAlign =
                 "center";
 
-
             ctx.textBaseline =
                 "middle";
-
 
             ctx.fillText(
                 "$",
@@ -4543,14 +2692,11 @@ function drawCoins() {
 }
 
 
-/* =========================================================
-   FUEL DRAW
-========================================================= */
+/* ================= FUEL ================= */
 
 function drawFuelItems() {
 
     ctx.save();
-
 
     ctx.translate(
         -cameraX,
@@ -4559,68 +2705,39 @@ function drawFuelItems() {
 
 
     fuelItems.forEach(
-        function (item) {
+        item => {
 
-            if (
-                item.collected
-            ) {
+            if (item.collected) {
                 return;
             }
 
 
-            ctx.save();
-
-
-            ctx.translate(
-                item.x,
-                item.y
-            );
-
-
             ctx.fillStyle =
-                "#e53935";
+                "#f44336";
 
 
             ctx.fillRect(
-                -12,
-                -17,
+                item.x - 12,
+                item.y - 17,
                 24,
                 32
             );
 
 
             ctx.fillStyle =
-                "#b71c1c";
-
-
-            ctx.fillRect(
-                -6,
-                -21,
-                12,
-                5
-            );
-
-
-            ctx.fillStyle =
                 "white";
-
 
             ctx.font =
                 "bold 16px Arial";
 
-
             ctx.textAlign =
                 "center";
 
-
             ctx.fillText(
                 "F",
-                0,
-                5
+                item.x,
+                item.y + 5
             );
-
-
-            ctx.restore();
 
         }
     );
@@ -4631,14 +2748,11 @@ function drawFuelItems() {
 }
 
 
-/* =========================================================
-   OBSTACLES DRAW
-========================================================= */
+/* ================= OBSTACLES ================= */
 
 function drawObstacles() {
 
     ctx.save();
-
 
     ctx.translate(
         -cameraX,
@@ -4647,22 +2761,11 @@ function drawObstacles() {
 
 
     obstacles.forEach(
-        function (obstacle) {
+        obstacle => {
 
-            if (
-                obstacle.hit
-            ) {
+            if (obstacle.hit) {
                 return;
             }
-
-
-            ctx.save();
-
-
-            ctx.translate(
-                obstacle.x,
-                obstacle.y
-            );
 
 
             ctx.fillStyle =
@@ -4671,49 +2774,35 @@ function drawObstacles() {
 
             ctx.beginPath();
 
-
             ctx.moveTo(
-                -obstacle.width / 2,
-                0
-            );
-
-
-            ctx.lineTo(
-                -obstacle.width * 0.25,
-                -obstacle.height
-            );
-
-
-            ctx.lineTo(
-                obstacle.width * 0.2,
-                -obstacle.height * 0.8
-            );
-
-
-            ctx.lineTo(
+                obstacle.x -
                 obstacle.width / 2,
-                0
+                obstacle.y
             );
 
+            ctx.lineTo(
+                obstacle.x -
+                obstacle.width * .25,
+                obstacle.y -
+                obstacle.height
+            );
+
+            ctx.lineTo(
+                obstacle.x +
+                obstacle.width * .2,
+                obstacle.y -
+                obstacle.height * .8
+            );
+
+            ctx.lineTo(
+                obstacle.x +
+                obstacle.width / 2,
+                obstacle.y
+            );
 
             ctx.closePath();
 
-
             ctx.fill();
-
-
-            ctx.strokeStyle =
-                "#263238";
-
-
-            ctx.lineWidth =
-                2;
-
-
-            ctx.stroke();
-
-
-            ctx.restore();
 
         }
     );
@@ -4724,119 +2813,19 @@ function drawObstacles() {
 }
 
 
-/* =========================================================
-   SAFE ROUNDED RECT
-========================================================= */
-
-function roundedRect(
-    x,
-    y,
-    width,
-    height,
-    radius
-) {
-
-    radius =
-        Math.min(
-            radius,
-            width / 2,
-            height / 2
-        );
-
-
-    ctx.beginPath();
-
-
-    ctx.moveTo(
-        x + radius,
-        y
-    );
-
-
-    ctx.lineTo(
-        x + width - radius,
-        y
-    );
-
-
-    ctx.quadraticCurveTo(
-        x + width,
-        y,
-        x + width,
-        y + radius
-    );
-
-
-    ctx.lineTo(
-        x + width,
-        y + height - radius
-    );
-
-
-    ctx.quadraticCurveTo(
-        x + width,
-        y + height,
-        x + width - radius,
-        y + height
-    );
-
-
-    ctx.lineTo(
-        x + radius,
-        y + height
-    );
-
-
-    ctx.quadraticCurveTo(
-        x,
-        y + height,
-        x,
-        y + height - radius
-    );
-
-
-    ctx.lineTo(
-        x,
-        y + radius
-    );
-
-
-    ctx.quadraticCurveTo(
-        x,
-        y,
-        x + radius,
-        y
-    );
-
-
-    ctx.closePath();
-
-}
-
-
-/* =========================================================
-   CAR DRAW
-========================================================= */
+/* ================= CAR ================= */
 
 function drawCar() {
 
     const vehicle =
-        vehicles[
-            selectedVehicle
-        ];
-
-
-    if (!vehicle) {
-        return;
-    }
+        vehicles[selectedVehicle];
 
 
     ctx.save();
 
 
     ctx.translate(
-        carX -
-        cameraX,
+        carX - cameraX,
         carY
     );
 
@@ -4847,44 +2836,36 @@ function drawCar() {
 
 
     ctx.fillStyle =
-        "rgba(0,0,0,0.22)";
+        "rgba(0,0,0,.22)";
 
 
     ctx.beginPath();
 
-
     ctx.ellipse(
         0,
-        23,
-        vehicle.width * 0.5,
+        24,
+        vehicle.width * .5,
         8,
         0,
         0,
         Math.PI * 2
     );
 
-
     ctx.fill();
 
 
     if (
-        selectedVehicle ===
-        "bike"
+        selectedVehicle === "bike"
     ) {
 
         drawBike();
 
     } else {
 
-        const color =
-            selectedVehicle ===
-            "suv"
-                ? "#1565c0"
-                : "#e53935";
-
-
         drawCarBody(
-            color,
+            selectedVehicle === "suv"
+                ? "#1565c0"
+                : "#e53935",
             vehicle
         );
 
@@ -4896,60 +2877,51 @@ function drawCar() {
 }
 
 
-/* =========================================================
-   CAR BODY
-========================================================= */
-
 function drawCarBody(
-    bodyColor,
+    color,
     vehicle
 ) {
 
     ctx.fillStyle =
-        bodyColor;
+        color;
 
 
-    roundedRect(
+    ctx.beginPath();
+
+    ctx.roundRect(
         -vehicle.width / 2,
         -vehicle.height,
         vehicle.width,
-        vehicle.height * 0.62,
-        8
+        vehicle.height * .62,
+        9
     );
-
 
     ctx.fill();
 
 
     ctx.beginPath();
 
-
     ctx.moveTo(
-        -vehicle.width * 0.28,
+        -vehicle.width * .28,
         -vehicle.height
     );
 
-
     ctx.lineTo(
-        -vehicle.width * 0.12,
+        -vehicle.width * .12,
         -vehicle.height * 1.38
     );
 
-
     ctx.lineTo(
-        vehicle.width * 0.22,
+        vehicle.width * .22,
         -vehicle.height * 1.38
     );
 
-
     ctx.lineTo(
-        vehicle.width * 0.38,
+        vehicle.width * .38,
         -vehicle.height
     );
-
 
     ctx.closePath();
-
 
     ctx.fill();
 
@@ -4960,78 +2932,43 @@ function drawCarBody(
 
     ctx.beginPath();
 
-
     ctx.moveTo(
-        -vehicle.width * 0.08,
+        -vehicle.width * .08,
         -vehicle.height * 1.31
     );
 
-
     ctx.lineTo(
-        vehicle.width * 0.18,
+        vehicle.width * .18,
         -vehicle.height * 1.31
     );
 
-
     ctx.lineTo(
-        vehicle.width * 0.29,
+        vehicle.width * .29,
         -vehicle.height * 1.04
     );
 
-
     ctx.lineTo(
-        -vehicle.width * 0.04,
+        -vehicle.width * .04,
         -vehicle.height * 1.04
     );
-
 
     ctx.closePath();
 
-
-    ctx.fill();
-
-
-    ctx.fillStyle =
-        "#fff59d";
-
-
-    ctx.beginPath();
-
-
-    ctx.arc(
-        vehicle.width * 0.43,
-        -vehicle.height * 0.48,
-        4,
-        0,
-        Math.PI * 2
-    );
-
-
     ctx.fill();
 
 
     drawWheel(
-        -vehicle.width * 0.32,
-        1
+        -vehicle.width * .32
     );
 
-
     drawWheel(
-        vehicle.width * 0.32,
-        1
+        vehicle.width * .32
     );
 
 }
 
 
-/* =========================================================
-   WHEEL
-========================================================= */
-
-function drawWheel(
-    x,
-    y
-) {
+function drawWheel(x) {
 
     ctx.fillStyle =
         "#212121";
@@ -5039,15 +2976,13 @@ function drawWheel(
 
     ctx.beginPath();
 
-
     ctx.arc(
         x,
-        y,
+        1,
         11,
         0,
         Math.PI * 2
     );
-
 
     ctx.fill();
 
@@ -5058,37 +2993,28 @@ function drawWheel(
 
     ctx.beginPath();
 
-
     ctx.arc(
         x,
-        y,
+        1,
         5,
         0,
         Math.PI * 2
     );
-
 
     ctx.fill();
 
 }
 
 
-/* =========================================================
-   BIKE
-========================================================= */
-
 function drawBike() {
 
     ctx.strokeStyle =
         "#212121";
 
-
-    ctx.lineWidth =
-        5;
+    ctx.lineWidth = 5;
 
 
     ctx.beginPath();
-
 
     ctx.arc(
         -19,
@@ -5098,12 +3024,10 @@ function drawBike() {
         Math.PI * 2
     );
 
-
     ctx.stroke();
 
 
     ctx.beginPath();
-
 
     ctx.arc(
         19,
@@ -5113,64 +3037,41 @@ function drawBike() {
         Math.PI * 2
     );
 
-
     ctx.stroke();
 
 
-    ctx.lineWidth =
-        6;
+    ctx.strokeStyle =
+        "#212121";
+
+    ctx.lineWidth = 7;
 
 
     ctx.beginPath();
-
 
     ctx.moveTo(
         -19,
         0
     );
-
 
     ctx.lineTo(
         -5,
         -20
     );
 
-
     ctx.lineTo(
         19,
         0
     );
-
 
     ctx.lineTo(
         5,
         -6
     );
 
-
     ctx.lineTo(
         -19,
         0
     );
-
-
-    ctx.stroke();
-
-
-    ctx.beginPath();
-
-
-    ctx.moveTo(
-        19,
-        0
-    );
-
-
-    ctx.lineTo(
-        22,
-        -17
-    );
-
 
     ctx.stroke();
 
@@ -5181,7 +3082,6 @@ function drawBike() {
 
     ctx.beginPath();
 
-
     ctx.arc(
         4,
         -27,
@@ -5190,100 +3090,12 @@ function drawBike() {
         Math.PI * 2
     );
 
-
     ctx.fill();
 
-
-    ctx.strokeStyle =
-        "#212121";
-
-
-    ctx.lineWidth =
-        6;
-
-
-    ctx.beginPath();
-
-
-    ctx.moveTo(
-        3,
-        -20
-    );
-
-
-    ctx.lineTo(
-        -5,
-        -8
-    );
-
-
-    ctx.stroke();
-
 }
 
 
-/* =========================================================
-   LIVES
-========================================================= */
-
-function drawLivesOnCanvas() {
-
-    if (!running) {
-        return;
-    }
-
-
-    ctx.save();
-
-
-    ctx.font =
-        "bold 16px Arial";
-
-
-    ctx.fillStyle =
-        "white";
-
-
-    ctx.fillText(
-        "LIVES",
-        20,
-        H - 95
-    );
-
-
-    for (
-        let i = 0;
-        i < 3;
-        i++
-    ) {
-
-        ctx.globalAlpha =
-            i < lives
-                ? 1
-                : 0.25;
-
-
-        ctx.font =
-            "22px Arial";
-
-
-        ctx.fillText(
-            "❤️",
-            20 + i * 27,
-            H - 65
-        );
-
-    }
-
-
-    ctx.restore();
-
-}
-
-
-/* =========================================================
-   DRAW
-========================================================= */
+/* ================= DRAW ================= */
 
 function draw() {
 
@@ -5301,6 +3113,8 @@ function draw() {
 
     drawTerrain();
 
+    drawCheckpointMarkers();
+
     drawCoins();
 
     drawFuelItems();
@@ -5309,62 +3123,24 @@ function draw() {
 
     drawCar();
 
-    drawLivesOnCanvas();
-
 }
 
 
-/* =========================================================
-   MENU STATS
-========================================================= */
-
-function updateMenuStats() {
-
-    menuCoins.textContent =
-        totalCoins;
-
-
-    menuBestScore.textContent =
-        bestDistance;
-
-
-    updateGarageUI();
-
-    updateVehicleUI();
-
-    updateMissionsUI();
-
-    updateAchievementUI();
-
-    updateRewardUI();
-
-}
-
-
-/* =========================================================
-   GAME LOOP
-========================================================= */
+/* ================= GAME LOOP ================= */
 
 function gameLoop(timestamp) {
 
     if (!lastTime) {
-
-        lastTime =
-            timestamp;
-
+        lastTime = timestamp;
     }
 
 
     let dt =
-        (
-            timestamp -
-            lastTime
-        ) /
-        16.67;
+        (timestamp - lastTime)
+        / 16.67;
 
 
-    lastTime =
-        timestamp;
+    lastTime = timestamp;
 
 
     dt =
@@ -5394,22 +3170,6 @@ function gameLoop(timestamp) {
     );
 
 }
-
-
-/* =========================================================
-   INITIALIZE
-========================================================= */
-
-updateMenuStats();
-
-
-checkAchievements();
-
-
-updateMissionsUI();
-
-
-updateRewardUI();
 
 
 requestAnimationFrame(
