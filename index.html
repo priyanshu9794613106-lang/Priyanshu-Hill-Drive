@@ -3,25 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Priyanshu Hill Drive</title>
+
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<!-- ================= MAIN MENU ================= -->
+<!-- =====================================================
+     MAIN MENU
+===================================================== -->
 
 <div id="menu">
 
     <div class="menu-card">
 
-        <div class="game-icon">🚗</div>
+        <div class="game-icon">
+            🚗
+        </div>
 
-        <h1>PRIYANSHU</h1>
-        <h2>HILL DRIVE</h2>
+        <h1>
+            PRIYANSHU
+        </h1>
+
+        <h2>
+            HILL DRIVE
+        </h2>
 
         <p class="developer">
-            Developed by <strong>Priyanshu Mishra</strong>
+            Developed by
+            <strong>Priyanshu Mishra</strong>
         </p>
 
 
@@ -31,6 +43,7 @@
 
             <div class="stat-box">
                 🏆 BEST
+
                 <strong>
                     <span id="menuBestScore">0</span> m
                 </strong>
@@ -38,7 +51,10 @@
 
             <div class="stat-box">
                 🪙 COINS
-                <strong id="menuCoins">0</strong>
+
+                <strong id="menuCoins">
+                    0
+                </strong>
             </div>
 
         </div>
@@ -75,7 +91,7 @@
         </div>
 
 
-        <!-- VEHICLE -->
+        <!-- VEHICLES -->
 
         <div class="section-title">
             🚘 SELECT VEHICLE
@@ -177,7 +193,10 @@
                 </div>
 
                 <div class="garage-level">
-                    LV <span id="garageLevel">1</span>
+                    LV
+                    <span id="garageLevel">
+                        1
+                    </span>
                 </div>
 
             </div>
@@ -201,7 +220,9 @@
 
                         <span>
                             Lv
-                            <b id="engineLevel">1</b>/5
+                            <b id="engineLevel">
+                                1
+                            </b>/5
                         </span>
 
                     </div>
@@ -220,7 +241,7 @@
                     class="upgrade-btn"
                     id="engineUpgrade"
                 >
-                    🪙 <span>20</span>
+                    🪙 20
                 </button>
 
             </div>
@@ -244,7 +265,9 @@
 
                         <span>
                             Lv
-                            <b id="tireLevel">1</b>/5
+                            <b id="tireLevel">
+                                1
+                            </b>/5
                         </span>
 
                     </div>
@@ -263,7 +286,7 @@
                     class="upgrade-btn"
                     id="tireUpgrade"
                 >
-                    🪙 <span>20</span>
+                    🪙 20
                 </button>
 
             </div>
@@ -287,7 +310,9 @@
 
                         <span>
                             Lv
-                            <b id="fuelLevel">1</b>/5
+                            <b id="fuelLevel">
+                                1
+                            </b>/5
                         </span>
 
                     </div>
@@ -306,7 +331,7 @@
                     class="upgrade-btn"
                     id="fuelUpgrade"
                 >
-                    🪙 <span>20</span>
+                    🪙 20
                 </button>
 
             </div>
@@ -330,7 +355,9 @@
 
                         <span>
                             Lv
-                            <b id="speedLevel">1</b>/5
+                            <b id="speedLevel">
+                                1
+                            </b>/5
                         </span>
 
                     </div>
@@ -349,7 +376,7 @@
                     class="upgrade-btn"
                     id="speedUpgrade"
                 >
-                    🪙 <span>20</span>
+                    🪙 20
                 </button>
 
             </div>
@@ -364,6 +391,7 @@
             <div class="panel-header">
 
                 <div>
+
                     <div class="section-title">
                         🎯 MISSIONS
                     </div>
@@ -371,191 +399,190 @@
                     <small>
                         Complete missions and earn coins
                     </small>
+
                 </div>
 
                 <span class="panel-count">
-                    <span id="missionCompleted">0</span>/4
+                    <span id="missionCompleted">
+                        0
+                    </span>/4
                 </span>
 
             </div>
 
 
-            <div id="missionsList">
+            <div class="mission-card">
 
-                <!-- Mission 1 -->
+                <div class="mission-icon">
+                    🛣️
+                </div>
 
-                <div class="mission-card">
+                <div class="mission-info">
 
-                    <div class="mission-icon">
-                        🛣️
+                    <strong>
+                        Road Runner
+                    </strong>
+
+                    <small>
+                        Drive 1000 meters
+                    </small>
+
+                    <div class="mission-progress">
+                        <span id="missionDistanceBar"></span>
                     </div>
 
-                    <div class="mission-info">
+                    <div class="mission-numbers">
 
-                        <strong>
-                            Road Runner
-                        </strong>
+                        <span id="missionDistanceText">
+                            0 / 1000 m
+                        </span>
 
-                        <small>
-                            Drive 1000 meters
-                        </small>
-
-                        <div class="mission-progress">
-                            <span id="missionDistanceBar"></span>
-                        </div>
-
-                        <div class="mission-numbers">
-                            <span id="missionDistanceText">
-                                0 / 1000 m
-                            </span>
-
-                            <b>
-                                +30 🪙
-                            </b>
-                        </div>
+                        <b>
+                            +30 🪙
+                        </b>
 
                     </div>
-
-                    <span
-                        class="mission-status"
-                        id="missionDistanceStatus"
-                    >
-                        0%
-                    </span>
 
                 </div>
 
+                <span
+                    class="mission-status"
+                    id="missionDistanceStatus"
+                >
+                    0%
+                </span>
 
-                <!-- Mission 2 -->
+            </div>
 
-                <div class="mission-card">
 
-                    <div class="mission-icon">
-                        🪙
+            <div class="mission-card">
+
+                <div class="mission-icon">
+                    🪙
+                </div>
+
+                <div class="mission-info">
+
+                    <strong>
+                        Coin Hunter
+                    </strong>
+
+                    <small>
+                        Collect 25 coins
+                    </small>
+
+                    <div class="mission-progress">
+                        <span id="missionCoinsBar"></span>
                     </div>
 
-                    <div class="mission-info">
+                    <div class="mission-numbers">
 
-                        <strong>
-                            Coin Hunter
-                        </strong>
+                        <span id="missionCoinsText">
+                            0 / 25
+                        </span>
 
-                        <small>
-                            Collect 25 coins
-                        </small>
-
-                        <div class="mission-progress">
-                            <span id="missionCoinsBar"></span>
-                        </div>
-
-                        <div class="mission-numbers">
-                            <span id="missionCoinsText">
-                                0 / 25
-                            </span>
-
-                            <b>
-                                +40 🪙
-                            </b>
-                        </div>
+                        <b>
+                            +40 🪙
+                        </b>
 
                     </div>
-
-                    <span
-                        class="mission-status"
-                        id="missionCoinsStatus"
-                    >
-                        0%
-                    </span>
 
                 </div>
 
+                <span
+                    class="mission-status"
+                    id="missionCoinsStatus"
+                >
+                    0%
+                </span>
 
-                <!-- Mission 3 -->
+            </div>
 
-                <div class="mission-card">
 
-                    <div class="mission-icon">
-                        ⛽
+            <div class="mission-card">
+
+                <div class="mission-icon">
+                    ⛽
+                </div>
+
+                <div class="mission-info">
+
+                    <strong>
+                        Fuel Saver
+                    </strong>
+
+                    <small>
+                        Collect 3 fuel cans
+                    </small>
+
+                    <div class="mission-progress">
+                        <span id="missionFuelBar"></span>
                     </div>
 
-                    <div class="mission-info">
+                    <div class="mission-numbers">
 
-                        <strong>
-                            Fuel Saver
-                        </strong>
+                        <span id="missionFuelText">
+                            0 / 3
+                        </span>
 
-                        <small>
-                            Collect 3 fuel cans
-                        </small>
-
-                        <div class="mission-progress">
-                            <span id="missionFuelBar"></span>
-                        </div>
-
-                        <div class="mission-numbers">
-                            <span id="missionFuelText">
-                                0 / 3
-                            </span>
-
-                            <b>
-                                +35 🪙
-                            </b>
-                        </div>
+                        <b>
+                            +35 🪙
+                        </b>
 
                     </div>
-
-                    <span
-                        class="mission-status"
-                        id="missionFuelStatus"
-                    >
-                        0%
-                    </span>
 
                 </div>
 
+                <span
+                    class="mission-status"
+                    id="missionFuelStatus"
+                >
+                    0%
+                </span>
 
-                <!-- Mission 4 -->
+            </div>
 
-                <div class="mission-card">
 
-                    <div class="mission-icon">
-                        ❤️
+            <div class="mission-card">
+
+                <div class="mission-icon">
+                    ❤️
+                </div>
+
+                <div class="mission-info">
+
+                    <strong>
+                        Survivor
+                    </strong>
+
+                    <small>
+                        Finish a run with 3 lives
+                    </small>
+
+                    <div class="mission-progress">
+                        <span id="missionLivesBar"></span>
                     </div>
 
-                    <div class="mission-info">
+                    <div class="mission-numbers">
 
-                        <strong>
-                            Survivor
-                        </strong>
+                        <span id="missionLivesText">
+                            Not completed
+                        </span>
 
-                        <small>
-                            Finish a run with 3 lives
-                        </small>
-
-                        <div class="mission-progress">
-                            <span id="missionLivesBar"></span>
-                        </div>
-
-                        <div class="mission-numbers">
-                            <span id="missionLivesText">
-                                Not completed
-                            </span>
-
-                            <b>
-                                +50 🪙
-                            </b>
-                        </div>
+                        <b>
+                            +50 🪙
+                        </b>
 
                     </div>
-
-                    <span
-                        class="mission-status"
-                        id="missionLivesStatus"
-                    >
-                        0%
-                    </span>
 
                 </div>
+
+                <span
+                    class="mission-status"
+                    id="missionLivesStatus"
+                >
+                    0%
+                </span>
 
             </div>
 
@@ -569,6 +596,7 @@
             <div class="panel-header">
 
                 <div>
+
                     <div class="section-title">
                         🏆 ACHIEVEMENTS
                     </div>
@@ -576,19 +604,21 @@
                     <small>
                         Become a Hill Drive legend
                     </small>
+
                 </div>
 
                 <span class="panel-count">
-                    <span id="achievementCompleted">0</span>/6
+
+                    <span id="achievementCompleted">
+                        0
+                    </span>/6
+
                 </span>
 
             </div>
 
 
-            <div
-                id="achievementsList"
-                class="achievement-grid"
-            >
+            <div class="achievement-grid">
 
                 <div
                     class="achievement-card"
@@ -646,7 +676,7 @@
                 >
                     <div>🔧</div>
                     <strong>Mechanic</strong>
-                    <small>Reach 5 upgrade levels</small>
+                    <small>Reach level 5</small>
                 </div>
 
             </div>
@@ -666,6 +696,8 @@
             <br>
             ⬅️ Arrow Left / A = BRAKE
             <br>
+            ⚡ N = NITRO
+            <br>
             📱 Mobile controls supported
             <br>
             ⏸️ P / ESC = PAUSE
@@ -676,38 +708,59 @@
 </div>
 
 
-<!-- ================= GAME ================= -->
+<!-- =====================================================
+     GAME CANVAS
+===================================================== -->
 
 <canvas id="gameCanvas"></canvas>
 
+
+<!-- COUNTDOWN -->
 
 <div id="countdown">
     3
 </div>
 
 
-<!-- HUD -->
+<!-- =====================================================
+     HUD
+===================================================== -->
 
 <div id="hud">
 
     <div class="hud-item">
         📏
-        <span id="distance">0</span> m
+        <span id="distance">
+            0
+        </span> m
     </div>
 
     <div class="hud-item">
         🪙
-        <span id="coins">0</span>
+        <span id="coins">
+            0
+        </span>
     </div>
 
     <div class="hud-item">
         ⛽
-        <span id="fuel">100</span>%
+        <span id="fuel">
+            100
+        </span>%
     </div>
 
-    <div class="hud-item lives">
+    <div class="hud-item">
         ❤️
-        <span id="lives">3</span>
+        <span id="lives">
+            3
+        </span>
+    </div>
+
+    <div
+        id="powerStatus"
+        class="power-status"
+    >
+        No Power-Up
     </div>
 
     <button
@@ -727,7 +780,9 @@
 </div>
 
 
-<!-- PAUSE -->
+<!-- =====================================================
+     PAUSE
+===================================================== -->
 
 <div id="pauseScreen">
 
@@ -754,7 +809,9 @@
 </div>
 
 
-<!-- MOBILE CONTROLS -->
+<!-- =====================================================
+     MOBILE CONTROLS
+===================================================== -->
 
 <div id="controls">
 
@@ -763,6 +820,13 @@
         class="control brake"
     >
         ◀ BRAKE
+    </button>
+
+    <button
+        id="nitroBtn"
+        class="control nitro"
+    >
+        ⚡ NITRO
     </button>
 
     <button
