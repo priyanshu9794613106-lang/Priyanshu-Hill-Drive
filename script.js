@@ -1,7 +1,7 @@
-/* =====================================================
-   PRIYANSHU HILL DRIVE
-   STEP 2 — REALISTIC HILL PHYSICS
-===================================================== */
+// ==========================================
+// PRIYANSHU HILL DRIVE - STEP 3
+// Fuel + Coins + Obstacles + Damage System
+// ==========================================
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -10,1595 +10,1529 @@ const menu = document.getElementById("menu");
 const startBtn = document.getElementById("startBtn");
 
 const hud = document.getElementById("hud");
-const controls = document.getElementById("controls");
-
 const distanceText = document.getElementById("distance");
 const coinsText = document.getElementById("coins");
 const fuelText = document.getElementById("fuel");
 
-const menuBestScore =
-  document.getElementById("menuBestScore");
-
+const controls = document.getElementById("controls");
 const gasBtn = document.getElementById("gasBtn");
 const brakeBtn = document.getElementById("brakeBtn");
 
+const menuBestScore = document.getElementById("menuBestScore");
 
-/* =====================================================
-   CANVAS
-===================================================== */
+// ==========================================
+// CANVAS
+// ==========================================
+
+let W = window.innerWidth;
+let H = window.innerHeight;
 
 function resizeCanvas() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
 }
 
+window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
 
-window.addEventListener("resize", () => {
-  resizeCanvas();
-
-  if (!gameRunning) {
-    createTerrain();
-    drawGame();
-  }
-});
-
-
-/* =====================================================
-   GAME STATE
-===================================================== */
+// ==========================================
+// GAME STATE
+// ==========================================
 
 let gameRunning = false;
-let animationId = null;
+let gameOver = false;
 
 let distance = 0;
 let coins = 0;
 let fuel = 100;
+let lives = 3;
 
 let speed = 0;
-let carX = 180;
-
 let cameraX = 0;
-
-let carVelocityY = 0;
-let carY = 0;
-
-let carAngle = 0;
-let wheelRotation = 0;
 
 let gasPressed = false;
 let brakePressed = false;
 
+let lastTime = 0;
 
-/* =====================================================
-   GAME SETTINGS
-===================================================== */
+// ==========================================
+// BEST SCORE
+// ==========================================
 
-const WORLD_WIDTH = 8000;
-const TERRAIN_STEP = 20;
+let bestDistance =
+    Number(localStorage.getItem("priyanshuHillBest")) || 0;
 
-const MAX_SPEED = 10;
-
-const ENGINE_POWER = 0.16;
-
-const BRAKE_POWER = 0.25;
-
-const FRICTION = 0.035;
-
-const GRAVITY = 0.5;
-
-const BOUNCE_POWER = -3.5;
-
-
-/* =====================================================
-   TERRAIN
-===================================================== */
-
-let terrain = [];
-let coinItems = [];
-let fuelItems = [];
-
-
-/* =====================================================
-   BEST SCORE
-===================================================== */
-
-let bestScore =
-  Number(
-    localStorage.getItem(
-      "priyanshuHillBestScore"
-    )
-  ) || 0;
-
-menuBestScore.textContent = bestScore;
-
-
-/* =====================================================
-   CREATE TERRAIN
-===================================================== */
-
-function createTerrain() {
-
-  terrain = [];
-
-  for (
-    let x = 0;
-    x <= WORLD_WIDTH;
-    x += TERRAIN_STEP
-  ) {
-
-    const y =
-      canvas.height * 0.68 +
-
-      Math.sin(x * 0.006) * 70 +
-
-      Math.sin(x * 0.014) * 30 +
-
-      Math.sin(x * 0.0023) * 45 +
-
-      Math.sin(x * 0.029) * 10;
-
-    terrain.push({
-      x,
-      y
-    });
-  }
+if (menuBestScore) {
+    menuBestScore.textContent = bestDistance;
 }
 
+// ==========================================
+// TERRAIN
+// ==========================================
 
-/* =====================================================
-   GROUND HEIGHT
-===================================================== */
+const terrain = [];
+
+function generateTerrain() {
+
+    terrain.length = 0;
+
+    for (let x = 0; x < 12000; x += 20) {
+
+        const y =
+            H * 0.68
+            + Math.sin(x * 0.004) * 65
+            + Math.sin(x * 0.009) * 25
+            + Math.sin(x * 0.018) * 12;
+
+        terrain.push({
+            x: x,
+            y: y
+        });
+    }
+}
+
+generateTerrain();
 
 function getGroundY(worldX) {
 
-  const index =
-    Math.floor(
-      worldX / TERRAIN_STEP
-    );
+    if (worldX < 0) {
+        return H * 0.68;
+    }
 
-  if (
-    index < 0 ||
-    index >= terrain.length
-  ) {
-    return canvas.height * 0.68;
-  }
+    let index = Math.floor(worldX / 20);
 
-  return terrain[index].y;
+    if (index < 0) index = 0;
+
+    if (index >= terrain.length - 1) {
+        index = terrain.length - 2;
+    }
+
+    const p1 = terrain[index];
+    const p2 = terrain[index + 1];
+
+    const ratio =
+        (worldX - p1.x) / (p2.x - p1.x);
+
+    return p1.y + (p2.y - p1.y) * ratio;
 }
 
+function getGroundAngle(worldX) {
 
-/* =====================================================
-   GROUND SLOPE
-===================================================== */
+    const y1 = getGroundY(worldX - 10);
+    const y2 = getGroundY(worldX + 10);
 
-function getGroundSlope(worldX) {
-
-  const y1 =
-    getGroundY(worldX - 10);
-
-  const y2 =
-    getGroundY(worldX + 10);
-
-  return (
-    Math.atan2(
-      y2 - y1,
-      20
-    )
-  );
+    return Math.atan2(y2 - y1, 20);
 }
 
+// ==========================================
+// CAR
+// ==========================================
 
-/* =====================================================
-   CREATE ITEMS
-===================================================== */
+const car = {
+    x: 180,
+    y: 0,
 
-function createItems() {
+    width: 85,
+    height: 42,
 
-  coinItems = [];
-  fuelItems = [];
+    vx: 0,
+    vy: 0,
 
+    angle: 0,
 
-  /* COINS */
+    wheelRotation: 0,
 
-  for (
-    let i = 0;
-    i < 110;
-    i++
-  ) {
+    onGround: false,
 
-    const x =
-      350 +
-      i * 65 +
-      Math.random() * 40;
+    bounce: 0,
 
-    coinItems.push({
+    invincible: false,
+    invincibleTimer: 0
+};
 
-      x,
+// ==========================================
+// OBJECTS
+// ==========================================
 
-      y:
-        getGroundY(x) -
-        55 -
-        Math.random() * 25,
+let coinItems = [];
+let fuelItems = [];
+let obstacles = [];
 
-      collected: false
+function createObjects() {
 
-    });
-  }
+    coinItems = [];
+    fuelItems = [];
+    obstacles = [];
 
+    // Coins
+    for (let x = 450; x < 12000; x += 350) {
 
-  /* FUEL */
+        coinItems.push({
+            x: x + Math.random() * 120,
+            yOffset: -55 - Math.random() * 30,
+            collected: false,
+            rotation: Math.random() * Math.PI * 2
+        });
+    }
 
-  for (
-    let i = 0;
-    i < 20;
-    i++
-  ) {
+    // Fuel
+    for (let x = 900; x < 12000; x += 1100) {
 
-    const x =
-      600 +
-      i * 350;
+        fuelItems.push({
+            x: x + Math.random() * 250,
+            collected: false
+        });
+    }
 
-    fuelItems.push({
+    // Rocks / obstacles
+    for (let x = 700; x < 12000; x += 500) {
 
-      x,
-
-      y:
-        getGroundY(x) -
-        55,
-
-      collected: false
-
-    });
-  }
+        obstacles.push({
+            x: x + Math.random() * 250,
+            size: 18 + Math.random() * 12,
+            hit: false
+        });
+    }
 }
 
-
-/* =====================================================
-   RESET GAME
-===================================================== */
+// ==========================================
+// RESET GAME
+// ==========================================
 
 function resetGame() {
 
-  distance = 0;
+    distance = 0;
+    coins = 0;
+    fuel = 100;
+    lives = 3;
 
-  coins = 0;
+    speed = 0;
+    cameraX = 0;
 
-  fuel = 100;
+    car.x = 180;
 
-  speed = 0;
+    car.y =
+        getGroundY(car.x) -
+        car.height -
+        20;
 
-  carX = 180;
+    car.vx = 0;
+    car.vy = 0;
 
-  cameraX = 0;
+    car.angle = 0;
+    car.wheelRotation = 0;
 
-  carVelocityY = 0;
+    car.onGround = false;
 
-  carAngle = 0;
+    car.bounce = 0;
 
-  wheelRotation = 0;
+    car.invincible = false;
+    car.invincibleTimer = 0;
 
-  createTerrain();
+    createObjects();
 
-  createItems();
-
-  carY =
-    getGroundY(carX) -
-    55;
-
-  updateHUD();
+    updateHUD();
 }
 
-
-/* =====================================================
-   START GAME
-===================================================== */
+// ==========================================
+// START GAME
+// ==========================================
 
 function startGame() {
 
-  resetGame();
+    resetGame();
 
-  gameRunning = true;
+    gameRunning = true;
+    gameOver = false;
 
-  menu.style.display = "none";
+    menu.style.display = "none";
 
-  hud.style.display = "flex";
+    hud.style.display = "flex";
+    controls.style.display = "flex";
 
-  controls.style.display = "flex";
+    lastTime = performance.now();
 
-  cancelAnimationFrame(animationId);
-
-  gameLoop();
+    requestAnimationFrame(gameLoop);
 }
 
+startBtn.addEventListener("click", startGame);
 
-/* =====================================================
-   GAME OVER
-===================================================== */
+// ==========================================
+// INPUT
+// ==========================================
 
-function gameOver() {
+window.addEventListener("keydown", (e) => {
 
-  gameRunning = false;
+    if (
+        e.code === "ArrowRight" ||
+        e.code === "KeyD" ||
+        e.code === "Space"
+    ) {
+        gasPressed = true;
+    }
 
-  cancelAnimationFrame(animationId);
+    if (
+        e.code === "ArrowLeft" ||
+        e.code === "KeyA"
+    ) {
+        brakePressed = true;
+    }
 
-  const finalDistance =
-    Math.floor(distance);
+    if (
+        (e.code === "Enter" || e.code === "Space") &&
+        gameOver
+    ) {
+        startGame();
+    }
+});
 
+window.addEventListener("keyup", (e) => {
 
-  if (
-    finalDistance >
-    bestScore
-  ) {
+    if (
+        e.code === "ArrowRight" ||
+        e.code === "KeyD" ||
+        e.code === "Space"
+    ) {
+        gasPressed = false;
+    }
 
-    bestScore =
-      finalDistance;
+    if (
+        e.code === "ArrowLeft" ||
+        e.code === "KeyA"
+    ) {
+        brakePressed = false;
+    }
+});
 
-    localStorage.setItem(
-      "priyanshuHillBestScore",
-      bestScore
-    );
-  }
+// ==========================================
+// MOBILE BUTTONS
+// ==========================================
 
+function pressButton(button, action) {
 
-  menu.innerHTML = `
+    button.addEventListener("pointerdown", (e) => {
 
-    <div class="menu-card">
+        e.preventDefault();
 
-      <div class="game-icon">
-        🏁
-      </div>
+        action(true);
+    });
 
-      <h1>GAME OVER</h1>
+    button.addEventListener("pointerup", (e) => {
 
-      <h2>GOOD DRIVE!</h2>
+        e.preventDefault();
 
-      <div class="best-box">
+        action(false);
+    });
 
-        📏 Distance:
-        <strong>
-          ${finalDistance} m
-        </strong>
+    button.addEventListener("pointercancel", () => {
+        action(false);
+    });
 
-        <br><br>
-
-        🪙 Coins:
-        <strong>
-          ${coins}
-        </strong>
-
-        <br><br>
-
-        🏆 Best:
-        <strong>
-          ${bestScore} m
-        </strong>
-
-      </div>
-
-      <button id="restartBtn">
-        🔄 PLAY AGAIN
-      </button>
-
-      <p class="instruction">
-        Try to climb farther!
-      </p>
-
-    </div>
-
-  `;
-
-  menu.style.display = "flex";
-
-  hud.style.display = "none";
-
-  controls.style.display = "none";
-
-
-  document
-    .getElementById("restartBtn")
-    .addEventListener(
-      "click",
-      startGame
-    );
+    button.addEventListener("pointerleave", () => {
+        action(false);
+    });
 }
 
+pressButton(gasBtn, (value) => {
+    gasPressed = value;
+});
 
-/* =====================================================
-   HUD
-===================================================== */
+pressButton(brakeBtn, (value) => {
+    brakePressed = value;
+});
+
+// ==========================================
+// PHYSICS
+// ==========================================
+
+function updatePhysics(dt) {
+
+    const gravity = 1450;
+
+    // --------------------------------------
+    // ENGINE
+    // --------------------------------------
+
+    if (gasPressed && fuel > 0) {
+
+        car.vx += 520 * dt;
+
+        fuel -= 7 * dt;
+    }
+
+    // --------------------------------------
+    // BRAKE
+    // --------------------------------------
+
+    if (brakePressed) {
+
+        car.vx -= 650 * dt;
+    }
+
+    // --------------------------------------
+    // NATURAL FRICTION
+    // --------------------------------------
+
+    car.vx *= Math.pow(0.985, dt * 60);
+
+    // --------------------------------------
+    // MAX SPEED
+    // --------------------------------------
+
+    const maxSpeed =
+        520 + Math.min(distance * 0.4, 300);
+
+    if (car.vx > maxSpeed) {
+        car.vx = maxSpeed;
+    }
+
+    if (car.vx < -180) {
+        car.vx = -180;
+    }
+
+    // --------------------------------------
+    // GRAVITY
+    // --------------------------------------
+
+    car.vy += gravity * dt;
+
+    car.x += car.vx * dt;
+    car.y += car.vy * dt;
+
+    // --------------------------------------
+    // TERRAIN COLLISION
+    // --------------------------------------
+
+    const groundY =
+        getGroundY(car.x);
+
+    const targetY =
+        groundY -
+        car.height -
+        15;
+
+    if (car.y >= targetY) {
+
+        car.y = targetY;
+
+        if (car.vy > 250) {
+
+            car.bounce = Math.min(
+                car.vy / 1200,
+                0.7
+            );
+        }
+
+        car.vy = -car.bounce * 500;
+
+        car.bounce *= 0.4;
+
+        car.onGround = true;
+
+    } else {
+
+        car.onGround = false;
+    }
+
+    // --------------------------------------
+    // CAR ANGLE
+    // --------------------------------------
+
+    const groundAngle =
+        getGroundAngle(car.x);
+
+    car.angle +=
+        (groundAngle - car.angle) *
+        Math.min(dt * 9, 1);
+
+    // --------------------------------------
+    // WHEEL ROTATION
+    // --------------------------------------
+
+    car.wheelRotation +=
+        car.vx * dt * 0.05;
+
+    // --------------------------------------
+    // CAMERA
+    // --------------------------------------
+
+    const targetCamera =
+        car.x - W * 0.28;
+
+    cameraX +=
+        (targetCamera - cameraX) *
+        Math.min(dt * 4, 1);
+
+    if (cameraX < 0) {
+        cameraX = 0;
+    }
+
+    // --------------------------------------
+    // DISTANCE
+    // --------------------------------------
+
+    distance =
+        Math.max(
+            distance,
+            Math.floor((car.x - 180) / 10)
+        );
+
+    // --------------------------------------
+    // INVINCIBILITY
+    // --------------------------------------
+
+    if (car.invincible) {
+
+        car.invincibleTimer -= dt;
+
+        if (car.invincibleTimer <= 0) {
+
+            car.invincible = false;
+        }
+    }
+
+    // --------------------------------------
+    // FUEL EMPTY
+    // --------------------------------------
+
+    if (fuel <= 0) {
+
+        fuel = 0;
+
+        car.vx *= 0.985;
+
+        if (Math.abs(car.vx) < 10) {
+
+            endGame();
+        }
+    }
+
+    checkCoins();
+    checkFuel();
+    checkObstacles();
+
+    updateHUD();
+}
+
+// ==========================================
+// COIN COLLISION
+// ==========================================
+
+function checkCoins() {
+
+    for (const coin of coinItems) {
+
+        if (coin.collected) {
+            continue;
+        }
+
+        const coinY =
+            getGroundY(coin.x) +
+            coin.yOffset;
+
+        const dx =
+            Math.abs(car.x - coin.x);
+
+        const dy =
+            Math.abs(
+                (car.y + car.height / 2) -
+                coinY
+            );
+
+        if (dx < 50 && dy < 60) {
+
+            coin.collected = true;
+
+            coins += 1;
+        }
+    }
+}
+
+// ==========================================
+// FUEL COLLISION
+// ==========================================
+
+function checkFuel() {
+
+    for (const item of fuelItems) {
+
+        if (item.collected) {
+            continue;
+        }
+
+        const fuelY =
+            getGroundY(item.x) - 55;
+
+        const dx =
+            Math.abs(car.x - item.x);
+
+        const dy =
+            Math.abs(
+                car.y - fuelY
+            );
+
+        if (dx < 55 && dy < 65) {
+
+            item.collected = true;
+
+            fuel += 30;
+
+            if (fuel > 100) {
+                fuel = 100;
+            }
+        }
+    }
+}
+
+// ==========================================
+// OBSTACLE COLLISION
+// ==========================================
+
+function checkObstacles() {
+
+    for (const rock of obstacles) {
+
+        if (rock.hit) {
+            continue;
+        }
+
+        const rockY =
+            getGroundY(rock.x) -
+            rock.size;
+
+        const dx =
+            Math.abs(car.x - rock.x);
+
+        const dy =
+            Math.abs(
+                car.y + car.height -
+                rockY
+            );
+
+        if (
+            dx < 50 &&
+            dy < 45 &&
+            !car.invincible
+        ) {
+
+            rock.hit = true;
+
+            crash();
+        }
+    }
+}
+
+// ==========================================
+// CRASH
+// ==========================================
+
+function crash() {
+
+    lives--;
+
+    car.invincible = true;
+    car.invincibleTimer = 2;
+
+    car.vx *= 0.45;
+
+    car.vy = -450;
+
+    car.bounce = 0.7;
+
+    if (lives <= 0) {
+
+        setTimeout(() => {
+            endGame();
+        }, 700);
+    }
+}
+
+// ==========================================
+// HUD
+// ==========================================
 
 function updateHUD() {
 
-  distanceText.textContent =
-    Math.floor(distance);
+    distanceText.textContent =
+        Math.max(0, distance);
 
-  coinsText.textContent =
-    coins;
+    coinsText.textContent =
+        coins;
 
-  fuelText.textContent =
-    Math.floor(fuel);
+    fuelText.textContent =
+        Math.max(0, Math.floor(fuel));
+
+    // Fuel warning
+    if (fuelText) {
+
+        if (fuel < 20) {
+
+            fuelText.style.color = "#ff5252";
+
+        } else {
+
+            fuelText.style.color = "";
+        }
+    }
 }
 
-
-/* =====================================================
-   PHYSICS UPDATE
-===================================================== */
-
-function updatePhysics() {
-
-  const slope =
-    getGroundSlope(carX);
-
-
-  /* ENGINE */
-
-  if (gasPressed) {
-
-    speed +=
-      ENGINE_POWER *
-      (1 - Math.abs(slope) * 0.5);
-
-  } else {
-
-    speed -= FRICTION;
-  }
-
-
-  /* GRAVITY ON HILLS */
-
-  const gravityForce =
-    Math.sin(slope) *
-    0.18;
-
-  speed -= gravityForce;
-
-
-  /* BRAKE */
-
-  if (brakePressed) {
-
-    speed -= BRAKE_POWER;
-  }
-
-
-  /* LIMIT SPEED */
-
-  speed =
-    Math.max(
-      0,
-      Math.min(
-        speed,
-        MAX_SPEED
-      )
-    );
-
-
-  /* MOVE */
-
-  carX += speed;
-
-
-  /* WHEEL ROTATION */
-
-  wheelRotation +=
-    speed * 0.12;
-
-
-  /* CAR ANGLE */
-
-  const targetAngle =
-    slope;
-
-
-  carAngle +=
-    (
-      targetAngle -
-      carAngle
-    ) * 0.12;
-
-
-  /* VERTICAL PHYSICS */
-
-  const groundY =
-    getGroundY(carX);
-
-
-  const targetY =
-    groundY -
-    50;
-
-
-  const difference =
-    targetY -
-    carY;
-
-
-  carVelocityY +=
-    GRAVITY;
-
-
-  carY +=
-    carVelocityY;
-
-
-  /* GROUND COLLISION */
-
-  if (
-    carY >= targetY
-  ) {
-
-    carY = targetY;
-
-    if (
-      carVelocityY > 1.5
-    ) {
-
-      carVelocityY =
-        BOUNCE_POWER;
-    } else {
-
-      carVelocityY = 0;
-    }
-  }
-
-
-  /* CAMERA */
-
-  cameraX =
-    Math.max(
-      0,
-      carX -
-      canvas.width * 0.28
-    );
-
-
-  /* DISTANCE */
-
-  distance =
-    carX / 10;
-
-
-  /* FUEL */
-
-  fuel -=
-    speed * 0.004;
-
-
-  if (fuel <= 0) {
-
-    fuel = 0;
-
-    gameOver();
-
-    return;
-  }
-
-
-  /* COINS */
-
-  coinItems.forEach(
-    coin => {
-
-      if (
-        !coin.collected &&
-        Math.abs(
-          coin.x - carX
-        ) < 40 &&
-        Math.abs(
-          coin.y - carY
-        ) < 60
-      ) {
-
-        coin.collected = true;
-
-        coins++;
-      }
-    }
-  );
-
-
-  /* FUEL */
-
-  fuelItems.forEach(
-    item => {
-
-      if (
-        !item.collected &&
-        Math.abs(
-          item.x - carX
-        ) < 40 &&
-        Math.abs(
-          item.y - carY
-        ) < 60
-      ) {
-
-        item.collected = true;
-
-        fuel =
-          Math.min(
-            100,
-            fuel + 25
-          );
-      }
-    }
-  );
-
-
-  /* WORLD END */
-
-  if (
-    carX >=
-    WORLD_WIDTH - 100
-  ) {
-
-    gameOver();
-
-    return;
-  }
-
-
-  updateHUD();
-}
-
-
-/* =====================================================
-   SKY
-===================================================== */
+// ==========================================
+// SKY
+// ==========================================
 
 function drawSky() {
 
-  const gradient =
-    ctx.createLinearGradient(
-      0,
-      0,
-      0,
-      canvas.height
+    const gradient =
+        ctx.createLinearGradient(
+            0,
+            0,
+            0,
+            H
+        );
+
+    gradient.addColorStop(
+        0,
+        "#66c7ff"
     );
 
-  gradient.addColorStop(
-    0,
-    "#2196F3"
-  );
+    gradient.addColorStop(
+        1,
+        "#dff6ff"
+    );
 
-  gradient.addColorStop(
-    1,
-    "#E1F5FE"
-  );
+    ctx.fillStyle = gradient;
 
-  ctx.fillStyle =
-    gradient;
+    ctx.fillRect(
+        0,
+        0,
+        W,
+        H
+    );
 
-  ctx.fillRect(
-    0,
-    0,
-    canvas.width,
-    canvas.height
-  );
+    // Sun
+
+    ctx.beginPath();
+
+    ctx.arc(
+        W - 100,
+        90,
+        45,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fillStyle =
+        "rgba(255,220,90,0.95)";
+
+    ctx.fill();
 }
 
+// ==========================================
+// CLOUDS
+// ==========================================
 
-/* =====================================================
-   SUN
-===================================================== */
+function drawCloud(x, y, scale = 1) {
 
-function drawSun() {
+    ctx.save();
 
-  ctx.save();
+    ctx.translate(x, y);
 
-  ctx.shadowBlur = 30;
+    ctx.scale(scale, scale);
 
-  ctx.shadowColor =
-    "rgba(255,200,50,0.7)";
+    ctx.fillStyle =
+        "rgba(255,255,255,0.85)";
 
-  ctx.fillStyle =
-    "#FFD54F";
+    ctx.beginPath();
 
-  ctx.beginPath();
+    ctx.arc(0, 10, 25, 0, Math.PI * 2);
 
-  ctx.arc(
-    canvas.width - 100,
-    90,
-    45,
-    0,
-    Math.PI * 2
-  );
+    ctx.arc(30, 0, 32, 0, Math.PI * 2);
 
-  ctx.fill();
+    ctx.arc(65, 12, 25, 0, Math.PI * 2);
 
-  ctx.restore();
+    ctx.fill();
+
+    ctx.restore();
 }
-
-
-/* =====================================================
-   CLOUDS
-===================================================== */
 
 function drawClouds() {
 
-  const clouds = [
+    drawCloud(
+        120 - cameraX * 0.08,
+        100,
+        1
+    );
 
-    [120, 110, 1],
+    drawCloud(
+        500 - cameraX * 0.05,
+        170,
+        0.8
+    );
 
-    [430, 160, 0.8],
-
-    [760, 100, 1.2]
-
-  ];
-
-
-  clouds.forEach(
-    cloud => {
-
-      const x =
-        cloud[0] -
-        cameraX * 0.15;
-
-      const y =
-        cloud[1];
-
-      const size =
-        cloud[2];
-
-
-      ctx.fillStyle =
-        "rgba(255,255,255,0.82)";
-
-
-      ctx.beginPath();
-
-      ctx.arc(
-        x,
-        y,
-        25 * size,
-        0,
-        Math.PI * 2
-      );
-
-      ctx.arc(
-        x + 30 * size,
-        y - 10 * size,
-        32 * size,
-        0,
-        Math.PI * 2
-      );
-
-      ctx.arc(
-        x + 65 * size,
-        y,
-        25 * size,
-        0,
-        Math.PI * 2
-      );
-
-      ctx.fill();
-    }
-  );
+    drawCloud(
+        850 - cameraX * 0.04,
+        80,
+        1.1
+    );
 }
 
-
-/* =====================================================
-   BACKGROUND MOUNTAINS
-===================================================== */
+// ==========================================
+// MOUNTAINS
+// ==========================================
 
 function drawMountains() {
 
-  ctx.fillStyle =
-    "#7CB342";
+    ctx.fillStyle =
+        "rgba(80,120,150,0.45)";
 
-  ctx.beginPath();
+    ctx.beginPath();
 
-  ctx.moveTo(
-    0,
-    canvas.height * 0.7
-  );
+    ctx.moveTo(0, H * 0.62);
 
+    for (
+        let x = -100;
+        x <= W + 100;
+        x += 100
+    ) {
 
-  for (
-    let x = 0;
-    x <= canvas.width;
-    x += 70
-  ) {
+        const worldX =
+            x + cameraX * 0.15;
 
-    const worldX =
-      x +
-      cameraX * 0.25;
+        const y =
+            H * 0.55 +
+            Math.sin(worldX * 0.004) * 55;
 
-    const y =
-      canvas.height * 0.52 +
-      Math.sin(
-        worldX * 0.006
-      ) * 70;
+        ctx.lineTo(
+            x,
+            y
+        );
+    }
 
-    ctx.lineTo(
-      x,
-      y
-    );
-  }
+    ctx.lineTo(W, H);
 
+    ctx.lineTo(0, H);
 
-  ctx.lineTo(
-    canvas.width,
-    canvas.height
-  );
+    ctx.closePath();
 
-  ctx.lineTo(
-    0,
-    canvas.height
-  );
-
-  ctx.closePath();
-
-  ctx.fill();
+    ctx.fill();
 }
 
-
-/* =====================================================
-   TERRAIN
-===================================================== */
+// ==========================================
+// TERRAIN DRAW
+// ==========================================
 
 function drawTerrain() {
 
-  ctx.fillStyle =
-    "#795548";
+    ctx.beginPath();
 
-  ctx.beginPath();
+    ctx.moveTo(
+        -20,
+        H
+    );
 
+    for (
+        let x = -20;
+        x <= W + 20;
+        x += 20
+    ) {
 
-  terrain.forEach(
-    (point, index) => {
+        const worldX =
+            x + cameraX;
 
-      const x =
-        point.x -
-        cameraX;
-
-      if (
-        index === 0
-      ) {
-
-        ctx.moveTo(
-          x,
-          point.y
-        );
-
-      } else {
+        const y =
+            getGroundY(worldX);
 
         ctx.lineTo(
-          x,
-          point.y
+            x,
+            y
         );
-      }
     }
-  );
 
+    ctx.lineTo(
+        W + 20,
+        H
+    );
 
-  ctx.lineTo(
-    WORLD_WIDTH -
-    cameraX,
-    canvas.height
-  );
+    ctx.closePath();
 
-  ctx.lineTo(
-    -cameraX,
-    canvas.height
-  );
+    ctx.fillStyle =
+        "#5c4033";
 
-  ctx.closePath();
+    ctx.fill();
 
-  ctx.fill();
+    // Grass
 
+    ctx.beginPath();
 
-  /* GRASS */
+    for (
+        let x = -20;
+        x <= W + 20;
+        x += 20
+    ) {
 
-  ctx.strokeStyle =
-    "#43A047";
+        const worldX =
+            x + cameraX;
 
-  ctx.lineWidth = 8;
+        const y =
+            getGroundY(worldX);
 
-  ctx.lineJoin =
-    "round";
-
-
-  ctx.beginPath();
-
-
-  terrain.forEach(
-    (point, index) => {
-
-      const x =
-        point.x -
-        cameraX;
-
-      if (
-        index === 0
-      ) {
-
-        ctx.moveTo(
-          x,
-          point.y
-        );
-
-      } else {
-
-        ctx.lineTo(
-          x,
-          point.y
-        );
-      }
+        if (x === -20) {
+            ctx.moveTo(x, y);
+        } else {
+            ctx.lineTo(x, y);
+        }
     }
-  );
 
+    ctx.strokeStyle =
+        "#43a047";
 
-  ctx.stroke();
+    ctx.lineWidth = 12;
+
+    ctx.stroke();
 }
 
-
-/* =====================================================
-   COINS
-===================================================== */
+// ==========================================
+// COINS
+// ==========================================
 
 function drawCoins() {
 
-  coinItems.forEach(
-    coin => {
+    for (const coin of coinItems) {
 
-      if (
-        coin.collected
-      ) return;
+        if (coin.collected) {
+            continue;
+        }
 
+        const screenX =
+            coin.x - cameraX;
 
-      const x =
-        coin.x -
-        cameraX;
+        if (
+            screenX < -50 ||
+            screenX > W + 50
+        ) {
+            continue;
+        }
 
+        const y =
+            getGroundY(coin.x) +
+            coin.yOffset;
 
-      if (
-        x < -30 ||
-        x >
-        canvas.width + 30
-      ) return;
+        coin.rotation += 0.05;
 
+        const scale =
+            Math.abs(
+                Math.sin(coin.rotation)
+            ) * 0.7 + 0.3;
 
-      ctx.save();
+        ctx.save();
 
-      ctx.shadowBlur = 12;
+        ctx.translate(
+            screenX,
+            y
+        );
 
-      ctx.shadowColor =
-        "#FFD700";
+        ctx.scale(
+            scale,
+            1
+        );
 
-      ctx.fillStyle =
-        "#FFD700";
+        ctx.beginPath();
 
+        ctx.arc(
+            0,
+            0,
+            13,
+            0,
+            Math.PI * 2
+        );
 
-      ctx.beginPath();
+        ctx.fillStyle =
+            "#ffd700";
 
-      ctx.arc(
-        x,
-        coin.y,
-        12,
-        0,
-        Math.PI * 2
-      );
+        ctx.fill();
 
-      ctx.fill();
+        ctx.strokeStyle =
+            "#c58c00";
 
+        ctx.lineWidth = 3;
 
-      ctx.strokeStyle =
-        "#B8860B";
+        ctx.stroke();
 
-      ctx.lineWidth = 2;
-
-      ctx.stroke();
-
-
-      ctx.fillStyle =
-        "#8B6508";
-
-      ctx.font =
-        "bold 12px Arial";
-
-      ctx.textAlign =
-        "center";
-
-      ctx.fillText(
-        "$",
-        x,
-        coin.y + 4
-      );
-
-
-      ctx.restore();
+        ctx.restore();
     }
-  );
 }
 
+// ==========================================
+// FUEL ITEMS
+// ==========================================
 
-/* =====================================================
-   FUEL
-===================================================== */
+function drawFuelItems() {
 
-function drawFuel() {
+    for (const item of fuelItems) {
 
-  fuelItems.forEach(
-    item => {
+        if (item.collected) {
+            continue;
+        }
 
-      if (
-        item.collected
-      ) return;
+        const screenX =
+            item.x - cameraX;
 
+        if (
+            screenX < -80 ||
+            screenX > W + 80
+        ) {
+            continue;
+        }
 
-      const x =
-        item.x -
-        cameraX;
+        const y =
+            getGroundY(item.x) - 50;
 
+        ctx.save();
 
-      if (
-        x < -30 ||
-        x >
-        canvas.width + 30
-      ) return;
+        ctx.translate(
+            screenX,
+            y
+        );
 
+        // Tank
 
-      ctx.save();
+        ctx.fillStyle =
+            "#e53935";
 
-      ctx.shadowBlur = 10;
+        ctx.fillRect(
+            -16,
+            -20,
+            32,
+            40
+        );
 
-      ctx.shadowColor =
-        "#ff5252";
+        // Top
 
+        ctx.fillStyle =
+            "#263238";
 
-      ctx.fillStyle =
-        "#E53935";
+        ctx.fillRect(
+            -8,
+            -27,
+            16,
+            8
+        );
 
+        // F
 
-      ctx.fillRect(
-        x - 13,
-        item.y - 18,
-        26,
-        32
-      );
+        ctx.fillStyle =
+            "white";
 
+        ctx.font =
+            "bold 20px Arial";
 
-      ctx.fillRect(
-        x - 7,
-        item.y - 24,
-        14,
-        6
-      );
+        ctx.textAlign =
+            "center";
 
+        ctx.fillText(
+            "F",
+            0,
+            8
+        );
 
-      ctx.fillStyle =
-        "#FFFFFF";
-
-      ctx.font =
-        "bold 16px Arial";
-
-      ctx.textAlign =
-        "center";
-
-      ctx.fillText(
-        "F",
-        x,
-        item.y + 5
-      );
-
-
-      ctx.restore();
+        ctx.restore();
     }
-  );
 }
 
+// ==========================================
+// OBSTACLES
+// ==========================================
 
-/* =====================================================
-   CAR
-===================================================== */
+function drawObstacles() {
+
+    for (const rock of obstacles) {
+
+        if (rock.hit) {
+            continue;
+        }
+
+        const screenX =
+            rock.x - cameraX;
+
+        if (
+            screenX < -60 ||
+            screenX > W + 60
+        ) {
+            continue;
+        }
+
+        const y =
+            getGroundY(rock.x);
+
+        ctx.save();
+
+        ctx.translate(
+            screenX,
+            y
+        );
+
+        ctx.fillStyle =
+            "#4e342e";
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            -rock.size,
+            0
+        );
+
+        ctx.lineTo(
+            -rock.size * 0.5,
+            -rock.size
+        );
+
+        ctx.lineTo(
+            rock.size * 0.6,
+            -rock.size * 1.1
+        );
+
+        ctx.lineTo(
+            rock.size,
+            0
+        );
+
+        ctx.closePath();
+
+        ctx.fill();
+
+        ctx.restore();
+    }
+}
+
+// ==========================================
+// CAR DRAW
+// ==========================================
 
 function drawCar() {
 
-  const x =
-    carX -
-    cameraX;
+    const screenX =
+        car.x - cameraX;
 
-  const y =
-    carY;
+    const screenY =
+        car.y;
 
+    ctx.save();
 
-  ctx.save();
+    ctx.translate(
+        screenX,
+        screenY
+    );
 
+    ctx.rotate(
+        car.angle
+    );
 
-  /* ROTATE CAR WITH HILL */
+    // Damage flash
+    if (
+        car.invincible &&
+        Math.floor(
+            performance.now() / 120
+        ) % 2 === 0
+    ) {
 
-  ctx.translate(
-    x,
-    y
-  );
+        ctx.globalAlpha = 0.35;
+    }
 
-  ctx.rotate(
-    carAngle
-  );
+    // Shadow
 
+    ctx.fillStyle =
+        "rgba(0,0,0,0.25)";
 
-  /* BODY */
+    ctx.beginPath();
 
-  ctx.fillStyle =
-    "#E53935";
+    ctx.ellipse(
+        0,
+        car.height + 15,
+        48,
+        8,
+        0,
+        0,
+        Math.PI * 2
+    );
 
+    ctx.fill();
 
-  ctx.beginPath();
+    // Car body
 
-  ctx.roundRect(
-    -38,
-    -28,
-    76,
-    28,
-    8
-  );
+    ctx.fillStyle =
+        "#e53935";
 
-  ctx.fill();
+    ctx.beginPath();
 
+    ctx.roundRect(
+        -42,
+        -30,
+        84,
+        35,
+        10
+    );
 
-  /* DARK LOWER BODY */
+    ctx.fill();
 
-  ctx.fillStyle =
-    "#B71C1C";
+    // Hood
 
-  ctx.fillRect(
-    -37,
-    -8,
-    74,
-    8
-  );
+    ctx.fillStyle =
+        "#c62828";
 
+    ctx.fillRect(
+        25,
+        -25,
+        22,
+        12
+    );
 
-  /* ROOF */
+    // Cabin
 
-  ctx.fillStyle =
-    "#C62828";
+    ctx.fillStyle =
+        "#263238";
 
+    ctx.beginPath();
 
-  ctx.beginPath();
+    ctx.moveTo(
+        -22,
+        -30
+    );
 
-  ctx.moveTo(
-    -25,
-    -28
-  );
+    ctx.lineTo(
+        -5,
+        -50
+    );
 
-  ctx.lineTo(
-    -10,
-    -48
-  );
+    ctx.lineTo(
+        22,
+        -50
+    );
 
-  ctx.lineTo(
-    20,
-    -48
-  );
+    ctx.lineTo(
+        35,
+        -30
+    );
 
-  ctx.lineTo(
-    33,
-    -28
-  );
+    ctx.closePath();
 
-  ctx.closePath();
+    ctx.fill();
 
-  ctx.fill();
+    // Windows
 
+    ctx.fillStyle =
+        "#90caf9";
 
-  /* WINDOWS */
+    ctx.beginPath();
 
-  ctx.fillStyle =
-    "#90CAF9";
+    ctx.moveTo(
+        -14,
+        -31
+    );
 
+    ctx.lineTo(
+        -3,
+        -44
+    );
 
-  ctx.beginPath();
+    ctx.lineTo(
+        8,
+        -44
+    );
 
-  ctx.moveTo(
-    -8,
-    -43
-  );
+    ctx.lineTo(
+        15,
+        -31
+    );
 
-  ctx.lineTo(
-    2,
-    -43
-  );
+    ctx.closePath();
 
-  ctx.lineTo(
-    2,
-    -30
-  );
+    ctx.fill();
 
-  ctx.lineTo(
-    -14,
-    -30
-  );
+    // Rear window
 
-  ctx.closePath();
+    ctx.fillStyle =
+        "#64b5f6";
 
-  ctx.fill();
+    ctx.beginPath();
 
+    ctx.moveTo(
+        10,
+        -44
+    );
 
-  ctx.beginPath();
+    ctx.lineTo(
+        21,
+        -31
+    );
 
-  ctx.moveTo(
-    6,
-    -43
-  );
+    ctx.lineTo(
+        29,
+        -31
+    );
 
-  ctx.lineTo(
-    18,
-    -43
-  );
+    ctx.lineTo(
+        19,
+        -44
+    );
 
-  ctx.lineTo(
-    27,
-    -30
-  );
+    ctx.closePath();
 
-  ctx.lineTo(
-    6,
-    -30
-  );
+    ctx.fill();
 
-  ctx.closePath();
+    // Wheels
 
-  ctx.fill();
+    drawWheel(
+        -27,
+        5
+    );
 
+    drawWheel(
+        27,
+        5
+    );
 
-  /* HEADLIGHT */
-
-  ctx.fillStyle =
-    "#FFF59D";
-
-  ctx.fillRect(
-    34,
-    -18,
-    7,
-    8
-  );
-
-
-  /* TAIL LIGHT */
-
-  ctx.fillStyle =
-    "#7F0000";
-
-  ctx.fillRect(
-    -41,
-    -18,
-    6,
-    8
-  );
-
-
-  /* WHEELS */
-
-  drawWheel(
-    -24,
-    0
-  );
-
-  drawWheel(
-    24,
-    0
-  );
-
-
-  ctx.restore();
+    ctx.restore();
 }
 
+// ==========================================
+// WHEEL
+// ==========================================
 
-/* =====================================================
-   WHEEL
-===================================================== */
+function drawWheel(x, y) {
 
-function drawWheel(
-  x,
-  y
-) {
+    ctx.save();
 
-  ctx.save();
+    ctx.translate(
+        x,
+        y
+    );
 
-  ctx.translate(
-    x,
-    y
-  );
+    ctx.rotate(
+        car.wheelRotation
+    );
 
+    ctx.beginPath();
 
-  ctx.rotate(
-    wheelRotation
-  );
+    ctx.arc(
+        0,
+        0,
+        14,
+        0,
+        Math.PI * 2
+    );
 
+    ctx.fillStyle =
+        "#151515";
 
-  /* TYRE */
+    ctx.fill();
 
-  ctx.fillStyle =
-    "#171717";
+    ctx.strokeStyle =
+        "#555";
 
+    ctx.lineWidth = 3;
 
-  ctx.beginPath();
+    ctx.stroke();
 
-  ctx.arc(
-    0,
-    0,
-    14,
-    0,
-    Math.PI * 2
-  );
+    // Spokes
 
-  ctx.fill();
+    ctx.strokeStyle =
+        "#bbb";
 
+    ctx.lineWidth = 2;
 
-  /* RIM */
+    for (
+        let i = 0;
+        i < 4;
+        i++
+    ) {
 
-  ctx.fillStyle =
-    "#BDBDBD";
+        const a =
+            i * Math.PI / 2;
 
+        ctx.beginPath();
 
-  ctx.beginPath();
+        ctx.moveTo(
+            0,
+            0
+        );
 
-  ctx.arc(
-    0,
-    0,
-    6,
-    0,
-    Math.PI * 2
-  );
+        ctx.lineTo(
+            Math.cos(a) * 9,
+            Math.sin(a) * 9
+        );
 
-  ctx.fill();
+        ctx.stroke();
+    }
 
-
-  /* SPOKE */
-
-  ctx.strokeStyle =
-    "#757575";
-
-  ctx.lineWidth = 2;
-
-
-  ctx.beginPath();
-
-  ctx.moveTo(
-    -6,
-    0
-  );
-
-  ctx.lineTo(
-    6,
-    0
-  );
-
-  ctx.stroke();
-
-
-  ctx.beginPath();
-
-  ctx.moveTo(
-    0,
-    -6
-  );
-
-  ctx.lineTo(
-    0,
-    6
-  );
-
-  ctx.stroke();
-
-
-  ctx.restore();
+    ctx.restore();
 }
 
+// ==========================================
+// DRAW LIVES
+// ==========================================
 
-/* =====================================================
-   DRAW GAME
-===================================================== */
+function drawLives() {
+
+    ctx.save();
+
+    ctx.font =
+        "bold 24px Arial";
+
+    ctx.textAlign =
+        "left";
+
+    ctx.fillStyle =
+        "white";
+
+    ctx.fillText(
+        "❤️".repeat(lives),
+        20,
+        115
+    );
+
+    ctx.restore();
+}
+
+// ==========================================
+// GAME DRAW
+// ==========================================
 
 function drawGame() {
 
-  drawSky();
+    drawSky();
 
-  drawSun();
+    drawClouds();
 
-  drawClouds();
+    drawMountains();
 
-  drawMountains();
+    drawTerrain();
 
-  drawTerrain();
+    drawCoins();
 
-  drawCoins();
+    drawFuelItems();
 
-  drawFuel();
+    drawObstacles();
 
-  drawCar();
+    drawCar();
+
+    drawLives();
 }
 
+// ==========================================
+// GAME LOOP
+// ==========================================
 
-/* =====================================================
-   GAME LOOP
-===================================================== */
+function gameLoop(time) {
 
-function gameLoop() {
+    if (!gameRunning) {
+        return;
+    }
 
-  if (!gameRunning) return;
+    let dt =
+        (time - lastTime) / 1000;
 
-  updatePhysics();
+    lastTime = time;
 
-  drawGame();
-
-  animationId =
-    requestAnimationFrame(
-      gameLoop
+    // Prevent huge physics jumps
+    dt = Math.min(
+        dt,
+        0.033
     );
+
+    updatePhysics(dt);
+
+    drawGame();
+
+    requestAnimationFrame(gameLoop);
 }
 
+// ==========================================
+// GAME OVER
+// ==========================================
 
-/* =====================================================
-   KEYBOARD CONTROLS
-===================================================== */
+function endGame() {
 
-window.addEventListener(
-  "keydown",
-  event => {
-
-    if (
-      event.code ===
-        "ArrowRight" ||
-      event.code ===
-        "KeyD"
-    ) {
-
-      gasPressed = true;
-
-      event.preventDefault();
+    if (!gameRunning) {
+        return;
     }
 
+    gameRunning = false;
+    gameOver = true;
 
-    if (
-      event.code ===
-        "ArrowLeft" ||
-      event.code ===
-        "KeyA"
-    ) {
+    if (distance > bestDistance) {
 
-      brakePressed = true;
+        bestDistance = distance;
 
-      event.preventDefault();
-    }
-  }
-);
-
-
-window.addEventListener(
-  "keyup",
-  event => {
-
-    if (
-      event.code ===
-        "ArrowRight" ||
-      event.code ===
-        "KeyD"
-    ) {
-
-      gasPressed = false;
+        localStorage.setItem(
+            "priyanshuHillBest",
+            bestDistance
+        );
     }
 
+    hud.style.display = "none";
+    controls.style.display = "none";
 
-    if (
-      event.code ===
-        "ArrowLeft" ||
-      event.code ===
-        "KeyA"
-    ) {
+    showGameOverScreen();
+}
 
-      brakePressed = false;
+// ==========================================
+// GAME OVER SCREEN
+// ==========================================
+
+function showGameOverScreen() {
+
+    menu.style.display = "flex";
+
+    const card =
+        menu.querySelector(".menu-card");
+
+    if (!card) {
+        return;
     }
-  }
-);
 
+    card.innerHTML = `
 
-/* =====================================================
-   MOBILE GAS
-===================================================== */
+        <div class="game-icon">💥</div>
 
-function pressGas(event) {
+        <h1>GAME OVER</h1>
 
-  event.preventDefault();
+        <h2>PRIYANSHU</h2>
 
-  gasPressed = true;
+        <p class="developer">
+            Great driving! Keep going 🚗
+        </p>
+
+        <div class="best-box">
+            📏 Distance:
+            <span>${distance}</span> m
+            <br><br>
+            🪙 Coins:
+            <span>${coins}</span>
+            <br><br>
+            🏆 Best:
+            <span>${bestDistance}</span> m
+        </div>
+
+        <button id="startBtn">
+            🔄 PLAY AGAIN
+        </button>
+
+        <p class="instruction">
+            ⌨️ Arrow Keys / D = GAS<br>
+            ⬅️ Arrow Left / A = BRAKE
+        </p>
+    `;
+
+    document
+        .getElementById("startBtn")
+        .addEventListener(
+            "click",
+            startGame
+        );
 }
 
-
-function releaseGas(event) {
-
-  event.preventDefault();
-
-  gasPressed = false;
-}
-
-
-gasBtn.addEventListener(
-  "pointerdown",
-  pressGas
-);
-
-gasBtn.addEventListener(
-  "pointerup",
-  releaseGas
-);
-
-gasBtn.addEventListener(
-  "pointercancel",
-  releaseGas
-);
-
-gasBtn.addEventListener(
-  "pointerleave",
-  releaseGas
-);
-
-
-/* =====================================================
-   MOBILE BRAKE
-===================================================== */
-
-function pressBrake(event) {
-
-  event.preventDefault();
-
-  brakePressed = true;
-}
-
-
-function releaseBrake(event) {
-
-  event.preventDefault();
-
-  brakePressed = false;
-}
-
-
-brakeBtn.addEventListener(
-  "pointerdown",
-  pressBrake
-);
-
-brakeBtn.addEventListener(
-  "pointerup",
-  releaseBrake
-);
-
-brakeBtn.addEventListener(
-  "pointercancel",
-  releaseBrake
-);
-
-brakeBtn.addEventListener(
-  "pointerleave",
-  releaseBrake
-);
-
-
-/* =====================================================
-   START BUTTON
-===================================================== */
-
-startBtn.addEventListener(
-  "click",
-  startGame
-);
-
-
-/* =====================================================
-   INITIALIZE
-===================================================== */
-
-createTerrain();
-
-createItems();
-
-carY =
-  getGroundY(carX) -
-  50;
+// ==========================================
+// INITIAL SCREEN
+// ==========================================
 
 updateHUD();
-
-drawGame();
