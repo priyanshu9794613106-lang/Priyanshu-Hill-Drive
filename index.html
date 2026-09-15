@@ -12,7 +12,7 @@
 
 <body>
 
-    <!-- MAIN MENU -->
+    <!-- MENU -->
 
     <div id="menu">
 
@@ -29,25 +29,15 @@
                 <strong>Priyanshu Mishra</strong>
             </p>
 
-            <!-- BEST SCORE -->
-
             <div class="best-box">
-
                 🏆 Best Distance:
                 <span id="menuBestScore">0</span> m
-
             </div>
-
-            <!-- COINS -->
 
             <div class="menu-coins">
-
                 🪙 Coins:
                 <strong id="menuCoins">0</strong>
-
             </div>
-
-            <!-- VEHICLE SELECT -->
 
             <div class="vehicle-title">
                 SELECT VEHICLE
@@ -59,15 +49,11 @@
                     class="vehicle-card selected"
                     data-vehicle="car">
 
-                    <div class="vehicle-emoji">
-                        🚗
-                    </div>
+                    <div class="vehicle-emoji">🚗</div>
 
                     <strong>RED RACER</strong>
 
-                    <small>
-                        Balanced
-                    </small>
+                    <small>Balanced</small>
 
                     <span class="vehicle-status">
                         SELECTED
@@ -80,15 +66,11 @@
                     class="vehicle-card locked"
                     data-vehicle="suv">
 
-                    <div class="vehicle-emoji">
-                        🚙
-                    </div>
+                    <div class="vehicle-emoji">🚙</div>
 
                     <strong>BLUE SUV</strong>
 
-                    <small>
-                        High Power
-                    </small>
+                    <small>High Power</small>
 
                     <span class="vehicle-status">
                         🔒 50 COINS
@@ -101,15 +83,11 @@
                     class="vehicle-card locked"
                     data-vehicle="bike">
 
-                    <div class="vehicle-emoji">
-                        🏍️
-                    </div>
+                    <div class="vehicle-emoji">🏍️</div>
 
                     <strong>HILL BIKE</strong>
 
-                    <small>
-                        Super Fast
-                    </small>
+                    <small>Super Fast</small>
 
                     <span class="vehicle-status">
                         🔒 100 COINS
@@ -119,22 +97,16 @@
 
             </div>
 
-            <!-- START -->
-
             <button id="startBtn">
                 ▶ START GAME
             </button>
 
             <p class="instruction">
-
-                ⌨️ Arrow Keys / D = Accelerate
+                ⌨️ Arrow Keys / D = GAS
                 <br>
-
-                ⬅️ Arrow Left / A = Brake
+                ⬅️ Arrow Left / A = BRAKE
                 <br>
-
-                📱 Mobile buttons supported
-
+                📱 Mobile controls supported
             </p>
 
         </div>
@@ -142,9 +114,16 @@
     </div>
 
 
-    <!-- GAME CANVAS -->
+    <!-- GAME -->
 
     <canvas id="gameCanvas"></canvas>
+
+
+    <!-- COUNTDOWN -->
+
+    <div id="countdown">
+        3
+    </div>
 
 
     <!-- HUD -->
@@ -166,10 +145,51 @@
             <span id="fuel">100</span>%
         </div>
 
+        <button
+            id="pauseBtn"
+            class="hud-button">
+
+            ⏸️
+
+        </button>
+
+        <button
+            id="soundBtn"
+            class="hud-button">
+
+            🔊
+
+        </button>
+
     </div>
 
 
-    <!-- MOBILE CONTROLS -->
+    <!-- PAUSE -->
+
+    <div id="pauseScreen">
+
+        <div class="pause-card">
+
+            <div class="pause-icon">
+                ⏸️
+            </div>
+
+            <h2>GAME PAUSED</h2>
+
+            <button id="resumeBtn">
+                ▶ RESUME
+            </button>
+
+            <button id="quitBtn">
+                🏠 MAIN MENU
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- CONTROLS -->
 
     <div id="controls">
 
@@ -180,7 +200,6 @@
             ◀ BRAKE
 
         </button>
-
 
         <button
             id="gasBtn"
